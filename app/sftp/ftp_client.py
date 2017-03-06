@@ -1,6 +1,7 @@
 import pysftp
 from flask import current_app
 
+
 class FtpClient():
     def init_app(self, app):
         self.host = app.config.get('FTP_HOST')
