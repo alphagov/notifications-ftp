@@ -13,6 +13,10 @@ class Config(object):
 
     NOTIFICATION_QUEUE_PREFIX = os.getenv('NOTIFICATION_QUEUE_PREFIX')
 
+    FTP_HOST = os.getenv('FTP_HOST')
+    FTP_USERNAME = os.getenv('FTP_USERNAME')
+    FTP_PASSWORD = os.getenv('FTP_PASSWORD')
+
     # Logging
     DEBUG = False
     LOGGING_STDOUT_JSON = os.getenv('LOGGING_STDOUT_JSON') == '1'

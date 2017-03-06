@@ -2,6 +2,7 @@ import os
 from monotonic import monotonic
 
 from app.celery.celery import NotifyCelery
+from app.sftp.ftp_client import FtpClient
 from flask import (
     Flask,
     request,
@@ -13,6 +14,7 @@ from notifications_utils.clients.statsd.statsd_client import StatsdClient
 
 notify_celery = NotifyCelery()
 statsd_client = StatsdClient()
+ftp_client = FtpClient()
 
 
 def create_app():
@@ -28,19 +30,18 @@ def create_app():
 
     notify_celery.init_app(application)
     statsd_client.init_app(application)
+    ftp_client.init_app(application)
 
     from app.status.status import status_blueprint
+    from app.sender.sender import sender_blueprint
 
     application.register_blueprint(status_blueprint)
+    application.register_blueprint(sender_blueprint)
 
     return application
 
 
 def init_app(app):
-    @app.before_request
-    def record_user_agent():
-        statsd_client.incr("user-agent.{}".format(process_user_agent(request.headers.get('User-Agent', None))))
-
     @app.before_request
     def record_request_details():
         g.start = monotonic()
@@ -55,20 +56,8 @@ def init_app(app):
 
     @app.errorhandler(Exception)
     def exception(e):
-        return jsonify(result='error', message=str(e)), error.code or 500
+        return jsonify(result='error', message=str(e))
 
     @app.errorhandler(404)
     def page_not_found(e):
         return jsonify(result='error', message=str(e)), 404
-
-
-def process_user_agent(user_agent_string):
-    if user_agent_string and user_agent_string.lower().startswith("notify"):
-        components = user_agent_string.split("/")
-        client_name = components[0].lower()
-        client_version = components[1].replace(".", "-")
-        return "{}.{}".format(client_name, client_version)
-    elif user_agent_string and not user_agent_string.lower().startswith("notify"):
-        return "non-notify-user-agent"
-    else:
-        return "unknown"
