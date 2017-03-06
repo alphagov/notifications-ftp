@@ -4,8 +4,6 @@ from kombu import Exchange, Queue
 import os
 
 
-
-
 class Config(object):
     # PLACEHOLDER
     PLACEHOLDER = os.environ['PLACEHOLDER']
@@ -56,10 +54,10 @@ class Config(object):
     STATSD_PORT = 8125
 
 
-
 ######################
 # Config overrides ###
 ######################
+
 
 class Development(Config):
     CSV_UPLOAD_BUCKET_NAME = 'development-notifications-csv-upload'
