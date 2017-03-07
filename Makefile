@@ -28,7 +28,6 @@ venv: venv/bin/activate ## Create virtualenv if it does not exist
 
 venv/bin/activate:
 	test -d venv || virtualenv venv -p python3
-	. venv/bin/activate && pip install pip-accel
 
 .PHONY: check-env-vars
 check-env-vars: ## Check mandatory environment variables
@@ -58,6 +57,7 @@ production: ## Set environment to production
 .PHONY: dependencies
 dependencies: venv ## Install build dependencies
 	mkdir -p ${PIP_ACCEL_CACHE}
+	. venv/bin/activate && pip install pip-accel
 	. venv/bin/activate && PIP_ACCEL_CACHE=${PIP_ACCEL_CACHE} pip-accel install -r requirements_for_test.txt
 
 .PHONY: generate-version-file
@@ -70,11 +70,11 @@ build: dependencies generate-version-file ## Build project
 	. venv/bin/activate && PIP_ACCEL_CACHE=${PIP_ACCEL_CACHE} pip-accel wheel --wheel-dir=wheelhouse -r requirements.txt
 
 .PHONY: test
-test: dependencies generate-version-file ## Run tests
+test: venv generate-version-file ## Run tests
 	./scripts/run_tests.sh
 
 .PHONY: coverage
-coverage: dependencies ## Create coverage report
+coverage: venv ## Create coverage report
 	. venv/bin/activate && coveralls
 
 .PHONY: prepare-docker-build-image
