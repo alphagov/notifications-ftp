@@ -10,7 +10,7 @@ Basic Flask/Celery python app.
 
 ### AWS credentials
 
-To run the API you will need appropriate AWS credentials. You should receive these from whoever administrates your AWS account. Make sure you've got both an access key id and a secret access key.
+To run the FTP application, you will need appropriate AWS credentials. You should receive these from whoever administrates your AWS account. Make sure you've got both an access key id and a secret access key.
 
 Your aws credentials should be stored in a folder located at `~/.aws`. Follow [Amazon's instructions](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-config-files) for storing them correctly.
 
@@ -25,7 +25,7 @@ mkvirtualenv -p /usr/local/bin/python3 notifications-ftp
 
 First, run `scripts/bootstrap.sh` to install dependencies.
 
-You need to run the api application and a local celery instance.
+You need to run the flask application and a local celery instance.
 
 There are three run scripts for running all the necessary parts.
 

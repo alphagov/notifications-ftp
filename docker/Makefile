@@ -13,7 +13,7 @@ build:
 		--build-arg HTTP_PROXY="${HTTP_PROXY}" \
 		--build-arg HTTPS_PROXY="${HTTP_PROXY}" \
 		--build-arg NO_PROXY="${NO_PROXY}" \
-		-t govuk/notify-api-builder:${DOCKER_IMAGE_TAG} \
+		-t govuk/notify-ftp-builder:${DOCKER_IMAGE_TAG} \
 		.
 
 .PHONY: bash
@@ -21,7 +21,7 @@ bash:
 	docker run -it --rm \
 		-e UID=$(shell id -u) \
 		-e GID=$(shell id -g) \
-		govuk/notify-api-builder:${DOCKER_IMAGE_TAG} \
+		govuk/notify-ftp-builder:${DOCKER_IMAGE_TAG} \
 		bash
 
 .PHONY: bash
@@ -29,5 +29,5 @@ bash-hostuser:
 	docker run -it --rm \
 		-e UID=$(shell id -u) \
 		-e GID=$(shell id -g) \
-		govuk/notify-api-builder:${DOCKER_IMAGE_TAG} \
+		govuk/notify-ftp-builder:${DOCKER_IMAGE_TAG} \
 		gosu hostuser bash
