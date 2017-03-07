@@ -47,12 +47,10 @@ scripts/run_celery_beat.sh
 
 ##  To test the application
 
-First, ensure that `scripts/bootstrap.sh` has been run.
-
-Then simply run
+Simply run
 
 ```
-make test
+make build test
 ```
 
 That will run pycodestyle for code analysis and our unit test suite.
