@@ -1,3 +1,16 @@
+version.py
+
+cache/*
+
+wheelhouse/*
+
+# ignore local config
+environment.sh
+
+celerybeat-schedule
+
+venv/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

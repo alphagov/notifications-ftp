@@ -1,0 +1,63 @@
+import os
+from monotonic import monotonic
+
+from app.celery.celery import NotifyCelery
+from app.sftp.ftp_client import FtpClient
+from flask import (
+    Flask,
+    request,
+    jsonify,
+    g,
+    url_for
+)
+from notifications_utils.clients.statsd.statsd_client import StatsdClient
+
+notify_celery = NotifyCelery()
+statsd_client = StatsdClient()
+ftp_client = FtpClient()
+
+
+def create_app():
+    application = Flask(__name__)
+
+    from app.config import configs
+
+    notify_environment = os.environ['NOTIFY_ENVIRONMENT']
+
+    application.config.from_object(configs[notify_environment])
+
+    init_app(application)
+
+    notify_celery.init_app(application)
+    statsd_client.init_app(application)
+    ftp_client.init_app(application)
+
+    from app.status.status import status_blueprint
+    from app.sender.sender import sender_blueprint
+
+    application.register_blueprint(status_blueprint)
+    application.register_blueprint(sender_blueprint)
+
+    return application
+
+
+def init_app(app):
+    @app.before_request
+    def record_request_details():
+        g.start = monotonic()
+        g.endpoint = request.endpoint
+
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+        return response
+
+    @app.errorhandler(Exception)
+    def exception(e):
+        return jsonify(result='error', message=str(e))
+
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return jsonify(result='error', message=str(e)), 404
