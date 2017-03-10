@@ -150,3 +150,14 @@ clean-docker-containers: ## Clean up any remaining docker containers
 clean:
 	rm -rf node_modules cache target venv .coverage build tests/.cache wheelhouse
 
+.PHONY: build-codedeploy-artifact
+build-codedeploy-artifact: ## Build the deploy artifact for CodeDeploy
+	rm -rf target
+	mkdir -p target
+	zip -y -q -r -x@deploy-exclude.lst target/notifications-ftp.zip ./
+
+.PHONY: upload-codedeploy-artifact ## Upload the deploy artifact for CodeDeploy
+upload-codedeploy-artifact: check-env-vars
+	$(if ${DEPLOY_BUILD_NUMBER},,$(error Must specify DEPLOY_BUILD_NUMBER))
+	aws s3 cp --region eu-west-1 --sse AES256 target/notifications-ftp.zip s3://${DNS_NAME}-codedeploy/notifications-ftp-${DEPLOY_BUILD_NUMBER}.zip
+
