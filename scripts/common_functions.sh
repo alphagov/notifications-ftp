@@ -372,7 +372,7 @@ get_elb_name_for_instance_name() {
     declare -A elb_to_instance_mapping
 
     elb_to_instance_mapping['notify-api']='notify-api'
-    elb_to_instance_mapping['notify-ftp']='notify-ftp-elb'
+    elb_to_instance_mapping['notify-ftp']='notify-ftp'
     elb_to_instance_mapping['notify-admin-api']='notify-admin-api'
 
     elb_to_instance_mapping['notify_api']='notify-api-elb'
