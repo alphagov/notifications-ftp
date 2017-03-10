@@ -161,3 +161,6 @@ upload-codedeploy-artifact: check-env-vars
 	$(if ${DEPLOY_BUILD_NUMBER},,$(error Must specify DEPLOY_BUILD_NUMBER))
 	aws s3 cp --region eu-west-1 --sse AES256 target/notifications-ftp.zip s3://${DNS_NAME}-codedeploy/notifications-ftp-${DEPLOY_BUILD_NUMBER}.zip
 
+.PHONY: deploy
+deploy: check-env-vars ## Trigger CodeDeploy for the api
+	aws deploy create-deployment --application-name notify-ftp --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name notify-ftp --s3-location bucket=${DNS_NAME}-codedeploy,key=notifications-ftp-${DEPLOY_BUILD_NUMBER}.zip,bundleType=zip --region eu-west-1
