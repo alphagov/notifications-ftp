@@ -5,9 +5,6 @@ import os
 
 
 class Config(object):
-    # PLACEHOLDER
-    PLACEHOLDER = os.environ['PLACEHOLDER']
-
     # Hosted graphite statsd prefix
     STATSD_PREFIX = os.getenv('STATSD_PREFIX')
 
