@@ -15,6 +15,6 @@ function stop
   fi
 }
 
-stop "notifications-api"
+stop "notifications-ftp"
 stop "notifications-ftp-celery-beat"
 stop "notifications-ftp-celery-worker"
