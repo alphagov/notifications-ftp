@@ -9,5 +9,8 @@ class FtpClient():
         self.password = app.config.get('FTP_PASSWORD')
 
     def send_file(self, filename):
-        with pysftp.Connection(self.host, username=self.username, password=self.password) as sftp:
+        cnopts = pysftp.CnOpts()
+        cnopts.hostkeys = None
+        with pysftp.Connection(self.host, username=self.username, password=self.password, cnopts=cnopts) as sftp:
+            sftp.chdir('notify')
             sftp.put(filename)
