@@ -54,6 +54,7 @@ class Config(object):
     STATSD_HOST = "statsd.hostedgraphite.com"
     STATSD_PORT = 8125
 
+    LOCAL_FILE_STORAGE_PATH = "~/dvla-file-storage"
 
 ######################
 # Config overrides ###
@@ -74,6 +75,7 @@ class Test(Config):
     STATSD_ENABLED = True
     STATSD_HOST = "localhost"
     STATSD_PORT = 1000
+    LOCAL_FILE_STORAGE_PATH = "/tmp/dvla-file-storage"
 
 
 class Preview(Config):

@@ -1,5 +1,6 @@
 from app import notify_celery
 from flask import current_app
+from boto3 import resource
 
 
 @notify_celery.task(name="test")
