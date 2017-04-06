@@ -42,7 +42,7 @@ class Config(object):
     CELERYBEAT_SCHEDULE = {
         'run-scheduled-jobs': {
             'task': 'test',
-            'schedule': crontab(minute=1),
+            'schedule': crontab(minute=30),
             'options': {'queue': 'process-ftp'}
         },
     }
