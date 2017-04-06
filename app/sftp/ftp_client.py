@@ -11,7 +11,6 @@ class FtpClient():
         self.password = app.config.get('FTP_PASSWORD')
         self.statsd_client = statsd_client
 
-
     def send_file(self, filename):
         cnopts = pysftp.CnOpts()
         cnopts.hostkeys = None
