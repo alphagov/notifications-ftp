@@ -22,5 +22,5 @@ def notify_ftp():
 def client(notify_ftp):
     with notify_ftp.test_request_context(), notify_ftp.test_client() as client:
         yield client
-        if ensure_local_file_directory():
+        if os.path.exists(current_app.config['LOCAL_FILE_STORAGE_PATH']):
             shutil.rmtree(current_app.config['LOCAL_FILE_STORAGE_PATH'], ignore_errors=False)

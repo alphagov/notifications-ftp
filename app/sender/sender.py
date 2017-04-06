@@ -7,6 +7,12 @@ from flask import (
 
 from app import ftp_client
 from app.celery.tasks import send_files_to_dvla
+from app.files.file_utils import (
+    get_file_from_s3,
+    create_local_file_directory,
+    concat_files,
+    ensure_local_file_directory
+)
 
 sender_blueprint = Blueprint('send', __name__)
 
@@ -21,4 +27,13 @@ def send_file():
 @sender_blueprint.route('/test-queue', methods=['GET'])
 def test_queue():
     send_files_to_dvla.apply_async(["BUCKET", ["1", "2", "3", "4", "5"]], queue="process-ftp")
+    return jsonify(result="success"), 200
+
+
+@sender_blueprint.route('/test-s3', methods=['GET'])
+def test_s3():
+    ensure_local_file_directory()
+    for job_id in request.args.getlist('job_id'):
+        get_file_from_s3(current_app.config['DVLA_UPLOAD_BUCKET_NAME'], job_id)
+    concat_files()
     return jsonify(result="success"), 200

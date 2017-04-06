@@ -56,6 +56,9 @@ class Config(object):
 
     LOCAL_FILE_STORAGE_PATH = "~/dvla-file-storage"
 
+    DVLA_UPLOAD_BUCKET_NAME = "{}-dvla-file-per-job".format(os.getenv('NOTIFY_ENVIRONMENT'))
+
+
 ######################
 # Config overrides ###
 ######################
@@ -66,6 +69,7 @@ class Development(Config):
     NOTIFY_ENVIRONMENT = 'development'
     NOTIFICATION_QUEUE_PREFIX = 'development'
     DEBUG = True
+    LOCAL_FILE_STORAGE_PATH = "/tmp/dvla-file-storage"
 
 
 class Test(Config):
