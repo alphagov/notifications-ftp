@@ -13,6 +13,7 @@ from app.files.file_utils import (
     concat_files,
     ensure_local_file_directory
 )
+from app.celery.tasks import send_files_to_dvla
 
 sender_blueprint = Blueprint('send', __name__)
 
@@ -32,8 +33,6 @@ def test_queue():
 
 @sender_blueprint.route('/test-s3', methods=['GET'])
 def test_s3():
-    ensure_local_file_directory()
-    for job_id in request.args.getlist('job_id'):
-        get_file_from_s3(current_app.config['DVLA_UPLOAD_BUCKET_NAME'], job_id)
-    concat_files()
+    request.args.getlist('job_id')
+    send_files_to_dvla.apply_async([request.args.getlist('job_id')], queue='process-ftp')
     return jsonify(result="success"), 200

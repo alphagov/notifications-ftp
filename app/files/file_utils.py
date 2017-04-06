@@ -26,8 +26,10 @@ def concat_files():
 
     if len(all_files) > 0:
         with open("{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], dvla_filename), 'w+') as dvla_file:
+            current_app.logger.info("making {}".format(dvla_file.name))
             for job_file in all_files:
                 with open("{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], job_file), 'r') as readfile:
+                    current_app.logger.info("concatenating {}".format(job_file))
                     shutil.copyfileobj(readfile, dvla_file)
 
 
@@ -38,7 +40,7 @@ def ensure_local_file_directory():
 
 def create_local_file_directory():
     if not os.path.exists(current_app.config['LOCAL_FILE_STORAGE_PATH']):
-        return os.makedirs(current_app.config['LOCAL_FILE_STORAGE_PATH'])
+        os.makedirs(current_app.config['LOCAL_FILE_STORAGE_PATH'])
 
 
 def remove_local_file_directory():
