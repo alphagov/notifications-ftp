@@ -66,10 +66,11 @@ def test_should_create_single_file_from_all_files_in_directory(client):
         with open(
                 "{}/Notify-201601011700-rq.txt".format(current_app.config['LOCAL_FILE_STORAGE_PATH'])
         ) as concat_file:
-            lines = concat_file.readlines()
-            assert lines[0].rstrip() == 'file-1'
-            assert lines[1].rstrip() == 'file-2'
-            assert lines[2].rstrip() == 'file-3'
+            lines = [line.rstrip() for line in concat_file.readlines()]
+            assert len(lines) == 3
+            assert 'file-1' in lines
+            assert 'file-2' in lines
+            assert 'file-3' in lines
 
 
 def test_should_leave_an_empty_directory_if_no_files_in_directory(client):
