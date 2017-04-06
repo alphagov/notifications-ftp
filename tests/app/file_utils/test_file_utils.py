@@ -59,7 +59,9 @@ def test_should_create_single_file_from_all_files_in_directory(client):
             with open("{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], file), 'w+') as test_file:
                 test_file.write(file + "\n")
 
-        concat_files()
+        filename = concat_files()
+
+        assert filename == "Notify-201601011700-rq.txt"
 
         with open(
                 "{}/Notify-201601011700-rq.txt".format(current_app.config['LOCAL_FILE_STORAGE_PATH'])

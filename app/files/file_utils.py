@@ -31,6 +31,7 @@ def concat_files():
                 with open("{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], job_file), 'r') as readfile:
                     current_app.logger.info("concatenating {}".format(job_file))
                     shutil.copyfileobj(readfile, dvla_file)
+    return dvla_filename
 
 
 def ensure_local_file_directory():
