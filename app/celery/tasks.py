@@ -24,5 +24,8 @@ def send_files_to_dvla(jobs_ids):
             get_file_from_s3(current_app.config['DVLA_UPLOAD_BUCKET_NAME'], job_id)
         dvla_file = concat_files()
         ftp_client.send_file("{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], dvla_file))
+
+        for job_id in jobs_ids:
+            notify_celery.send_task(name="update-letter-job-to-sent", args=(job_id,), queue="notify")
     finally:
         remove_local_file_directory()
