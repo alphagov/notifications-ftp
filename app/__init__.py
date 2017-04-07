@@ -30,7 +30,7 @@ def create_app():
 
     notify_celery.init_app(application)
     statsd_client.init_app(application)
-    ftp_client.init_app(application)
+    ftp_client.init_app(application, statsd_client)
 
     from app.status.status import status_blueprint
     from app.sender.sender import sender_blueprint

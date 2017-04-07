@@ -42,7 +42,7 @@ class Config(object):
     CELERYBEAT_SCHEDULE = {
         'run-scheduled-jobs': {
             'task': 'test',
-            'schedule': crontab(minute=1),
+            'schedule': crontab(minute=30),
             'options': {'queue': 'process-ftp'}
         },
     }
@@ -53,6 +53,10 @@ class Config(object):
     STATSD_ENABLED = False
     STATSD_HOST = "statsd.hostedgraphite.com"
     STATSD_PORT = 8125
+
+    LOCAL_FILE_STORAGE_PATH = "~/dvla-file-storage"
+
+    DVLA_UPLOAD_BUCKET_NAME = "{}-dvla-file-per-job".format(os.getenv('NOTIFY_ENVIRONMENT'))
 
 
 ######################
@@ -65,6 +69,7 @@ class Development(Config):
     NOTIFY_ENVIRONMENT = 'development'
     NOTIFICATION_QUEUE_PREFIX = 'development'
     DEBUG = True
+    LOCAL_FILE_STORAGE_PATH = "/tmp/dvla-file-storage"
 
 
 class Test(Config):
@@ -74,6 +79,7 @@ class Test(Config):
     STATSD_ENABLED = True
     STATSD_HOST = "localhost"
     STATSD_PORT = 1000
+    LOCAL_FILE_STORAGE_PATH = "/tmp/dvla-file-storage"
 
 
 class Preview(Config):
