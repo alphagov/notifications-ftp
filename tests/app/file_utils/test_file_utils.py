@@ -1,14 +1,15 @@
 import os
 from flask import current_app
 from freezegun import freeze_time
-
+import pytest
 from app.files.file_utils import (
     create_local_file_directory,
     ensure_local_file_directory,
     concat_files,
     job_file_name_for_job,
     dvla_file_name_for_concatanted_file,
-    remove_local_file_directory
+    remove_local_file_directory,
+    job_id_from_filename
 )
 
 
@@ -19,6 +20,10 @@ def test_dvla_file_name_for_concatanted_file():
 
 def test_should_make_job_filename_from_job_id():
     assert job_file_name_for_job("1234") == "1234-dvla-job.text"
+
+
+def test_should_make_job_id_from_job_filename():
+    assert job_id_from_filename("1234-dvla-job.text") == "1234"
 
 
 def test_should_create_directory_for_dval_files(client):
@@ -59,7 +64,7 @@ def test_should_create_single_file_from_all_files_in_directory(client):
             with open("{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], file), 'w+') as test_file:
                 test_file.write(file + "\n")
 
-        filename = concat_files()
+        filename, success, failure = concat_files()
 
         assert filename == "Notify-201601011700-rq.txt"
 
@@ -78,3 +83,40 @@ def test_should_leave_an_empty_directory_if_no_files_in_directory(client):
         ensure_local_file_directory()
         concat_files()
         assert len(os.listdir(current_app.config['LOCAL_FILE_STORAGE_PATH'])) == 0
+
+
+def test_should_return_filenames_grouped_by_success(client):
+    with freeze_time('2016-01-01T17:00:00'):
+        files = ['file-1', 'file-2', 'file-3']
+        ensure_local_file_directory()
+        for file in files:
+            with open("{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], file), 'w+') as test_file:
+                test_file.write(file + "\n")
+
+        filename, success, failure = concat_files()
+
+        assert filename == "Notify-201601011700-rq.txt"
+        assert success == ['file-1', 'file-2', 'file-3']
+        assert failure == []
+
+
+def test_should_return_filenames_grouped_by_success_and_failure(client, mocker):
+    with freeze_time('2016-01-01T17:00:00'):
+        def side_effect(*args, **kwargs):
+            if 'file-3' in args[0].name:
+                raise Exception("FILE FAILED")
+
+        mocker.patch('app.files.file_utils.copyfileobj', side_effect=side_effect)
+
+        files = ['file-1', 'file-2', 'file-3']
+        ensure_local_file_directory()
+        for file in files:
+            with open("{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], file), 'w+') as test_file:
+                test_file.write(file + "\n")
+
+        with pytest.raises(Exception) as excinfo:
+            filename, success, failure = concat_files()
+            assert 'FILE FAILED' in str(excinfo.value)
+            assert filename == "Notify-201601011700-rq.txt"
+            assert success == ['file-1', 'file-2']
+            assert failure == ['file-3']
