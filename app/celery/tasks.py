@@ -20,20 +20,24 @@ def test():
 @statsd(namespace="tasks")
 def send_files_to_dvla(jobs_ids):
     try:
+        failed_jobs = []
         ensure_local_file_directory()
         for job_id in jobs_ids:
-            get_file_from_s3(current_app.config['DVLA_UPLOAD_BUCKET_NAME'], job_id)
+            if not get_file_from_s3(current_app.config['DVLA_UPLOAD_BUCKET_NAME'], job_id):
+                failed_jobs.append(job_id)
 
-        dvla_file, success, failure = concat_files()
+        dvla_file, successful_jobs, failures = concat_files()
+        failed_jobs += [job_id_from_filename(failed_file) for failed_file in failures]
+
         ftp_client.send_file("{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], dvla_file))
 
-        for success_files in success:
+        for successful_job in successful_jobs:
             notify_celery.send_task(
-                name="update-letter-job-to-sent", args=(job_id_from_filename(success_files),), queue="notify"
+                name="update-letter-job-to-sent", args=(job_id_from_filename(successful_job),), queue="notify"
             )
-        for failed_files in failure:
+        for failed_job in failed_jobs:
             notify_celery.send_task(
-                name="update-letter-job-to-error", args=(job_id_from_filename(failed_files),), queue="notify"
+                name="update-letter-job-to-error", args=(failed_job,), queue="notify"
             )
     finally:
         remove_local_file_directory()

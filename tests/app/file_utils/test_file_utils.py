@@ -9,8 +9,31 @@ from app.files.file_utils import (
     job_file_name_for_job,
     dvla_file_name_for_concatanted_file,
     remove_local_file_directory,
-    job_id_from_filename
+    job_id_from_filename,
+    get_file_from_s3
 )
+
+
+def test_should_return_true_on_successful_s3_download(client, mocker):
+    class Foo():
+        def download_fileobj(self, bucket_name, filename, job_file):
+            assert bucket_name == "bucket"
+            assert filename == "job_id-dvla-job.text"
+            assert job_file.name == "/tmp/dvla-file-storage/job_id-dvla-job.text"
+
+    ensure_local_file_directory()
+    mocker.patch('app.files.file_utils.boto3.client', return_value=Foo())
+    assert get_file_from_s3("bucket", "job_id")
+
+
+def test_should_return_false_on_failed_s3_download(client, mocker):
+    class Foo():
+        def download_fileobj(self, bucket_name, filename, job_file):
+            raise Exception("Failed to do S3")
+
+    ensure_local_file_directory()
+    mocker.patch('app.files.file_utils.boto3.client', return_value=Foo())
+    assert not get_file_from_s3("bucket", "job_id")
 
 
 def test_dvla_file_name_for_concatanted_file():
@@ -114,9 +137,7 @@ def test_should_return_filenames_grouped_by_success_and_failure(client, mocker):
             with open("{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], file), 'w+') as test_file:
                 test_file.write(file + "\n")
 
-        with pytest.raises(Exception) as excinfo:
-            filename, success, failure = concat_files()
-            assert 'FILE FAILED' in str(excinfo.value)
-            assert filename == "Notify-201601011700-rq.txt"
-            assert success == ['file-1', 'file-2']
-            assert failure == ['file-3']
+        filename, success, failure = concat_files()
+        assert filename == "Notify-201601011700-rq.txt"
+        assert success == ['file-1', 'file-2']
+        assert failure == ['file-3']
