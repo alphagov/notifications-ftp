@@ -119,7 +119,9 @@ def test_should_return_filenames_grouped_by_success(client):
         filename, success, failure = concat_files()
 
         assert filename == "Notify-201601011700-rq.txt"
-        assert success == ['file-1', 'file-2', 'file-3']
+        assert 'file-1' in success
+        assert 'file-2' in success
+        assert 'file-3' in success
         assert failure == []
 
 
@@ -139,5 +141,6 @@ def test_should_return_filenames_grouped_by_success_and_failure(client, mocker):
 
         filename, success, failure = concat_files()
         assert filename == "Notify-201601011700-rq.txt"
-        assert success == ['file-1', 'file-2']
-        assert failure == ['file-3']
+        assert 'file-1' in success
+        assert 'file-2' in success
+        assert 'file-3' in failure
