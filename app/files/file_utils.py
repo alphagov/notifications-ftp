@@ -25,10 +25,14 @@ def concat_files():
     all_files = os.listdir(current_app.config['LOCAL_FILE_STORAGE_PATH'])
 
     if len(all_files) > 0:
-        with open("{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], dvla_filename), 'w+') as dvla_file:
+        with open(
+                "{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], dvla_filename), 'w+', encoding="utf-8"
+        ) as dvla_file:
             current_app.logger.info("making {}".format(dvla_file.name))
             for job_file in all_files:
-                with open("{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], job_file), 'r') as readfile:
+                with open(
+                        "{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], job_file), 'r', encoding="utf-8"
+                ) as readfile:
                     current_app.logger.info("concatenating {}".format(job_file))
                     shutil.copyfileobj(readfile, dvla_file)
     return dvla_filename
