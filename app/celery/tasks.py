@@ -9,6 +9,7 @@ from app.files.file_utils import (
     ensure_local_file_directory
 )
 from app.statsd_decorators import statsd
+from app.sftp.ftp_client import FtpException
 
 
 @notify_celery.task(name="test")
@@ -38,6 +39,11 @@ def send_files_to_dvla(jobs_ids):
         for failed_job in failed_jobs:
             notify_celery.send_task(
                 name="update-letter-job-to-error", args=(failed_job,), queue="notify"
+            )
+    except FtpException as e:
+        for job_id in jobs_ids:
+            notify_celery.send_task(
+                name="update-letter-job-to-error", args=(job_id,), queue="notify"
             )
     finally:
         remove_local_file_directory()
