@@ -42,11 +42,11 @@ def test_dvla_file_name_for_concatanted_file():
 
 
 def test_should_make_job_filename_from_job_id():
-    assert job_file_name_for_job("1234") == "1234-dvla-job.text"
+    assert job_file_name_for_job("3872ce4a-8817-44b9-bca6-972ac6706b59") == "3872ce4a-8817-44b9-bca6-972ac6706b59-dvla-job.text"  # noqa
 
 
 def test_should_make_job_id_from_job_filename():
-    assert job_id_from_filename("1234-dvla-job.text") == "1234"
+    assert job_id_from_filename("3872ce4a-8817-44b9-bca6-972ac6706b59-dvla-job.text") == "3872ce4a-8817-44b9-bca6-972ac6706b59"  # noqa
 
 
 def test_should_create_directory_for_dval_files(client):

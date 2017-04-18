@@ -17,7 +17,7 @@ def job_file_name_for_job(job_id):
 
 
 def job_id_from_filename(job_filename):
-    return job_filename.split("-")[0]
+    return job_filename.replace("-dvla-job.text", "")
 
 
 def get_file_from_s3(bucket_name, job_id):
