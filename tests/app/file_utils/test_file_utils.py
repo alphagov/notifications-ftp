@@ -7,7 +7,7 @@ from app.files.file_utils import (
     ensure_local_file_directory,
     concat_files,
     job_file_name_for_job,
-    dvla_file_name_for_concatanted_file,
+    dvla_file_name_for_concatenated_file,
     remove_local_file_directory,
     job_id_from_filename,
     get_file_from_s3
@@ -38,7 +38,7 @@ def test_should_return_false_on_failed_s3_download(client, mocker):
 
 def test_dvla_file_name_for_concatanted_file():
     with freeze_time('2016-01-01T17:00:00'):
-        assert dvla_file_name_for_concatanted_file() == "Notify-201601011700-rq.txt"
+        assert dvla_file_name_for_concatenated_file() == "Notify-201601011700-rq.txt"
 
 
 def test_should_make_job_filename_from_job_id():

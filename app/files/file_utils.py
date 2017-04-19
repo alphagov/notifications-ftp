@@ -8,7 +8,7 @@ from shutil import (
 import boto3
 
 
-def dvla_file_name_for_concatanted_file():
+def dvla_file_name_for_concatenated_file():
     return "Notify-{}-rq.txt".format(datetime.utcnow().strftime("%Y%m%d%H%M"))
 
 
@@ -27,10 +27,9 @@ def get_file_from_s3(bucket_name, job_id):
         with open(full_path_to_file(filename), 'wb+') as job_file:
             s3.download_fileobj(bucket_name, filename, job_file)
         return True
-    except Exception as e:
+    except Exception:
         os.remove(full_path_to_file(filename))
-        current_app.logger.error(e)
-        current_app.logger.error("Failed to download {}".format(filename))
+        current_app.logger.exception("Failed to download {}".format(filename))
         return False
 
 
@@ -39,7 +38,7 @@ def full_path_to_file(filename):
 
 
 def concat_files():
-    dvla_filename = dvla_file_name_for_concatanted_file()
+    dvla_filename = dvla_file_name_for_concatenated_file()
     all_files = os.listdir(current_app.config['LOCAL_FILE_STORAGE_PATH'])
 
     success = []
@@ -54,9 +53,8 @@ def concat_files():
                         current_app.logger.info("concatenating {}".format(job_file))
                         copyfileobj(readfile, dvla_file)
                         success.append(job_file)
-                except Exception as e:
-                    current_app.logger.error(e)
-                    current_app.logger.error("Failed to concat {}".format(job_file))
+                except Exception:
+                    current_app.logger.exception("Failed to append {}".format(job_file))
                     failure.append(job_file)
     return dvla_filename, success, failure
 
