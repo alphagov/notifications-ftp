@@ -56,8 +56,6 @@ class Config(object):
 
     LOCAL_FILE_STORAGE_PATH = "~/dvla-file-storage"
 
-    DVLA_UPLOAD_BUCKET_NAME = "{}-dvla-file-per-job".format(os.getenv('NOTIFY_ENVIRONMENT'))
-
 
 ######################
 # Config overrides ###
@@ -70,6 +68,7 @@ class Development(Config):
     NOTIFICATION_QUEUE_PREFIX = 'development'
     DEBUG = True
     LOCAL_FILE_STORAGE_PATH = "/tmp/dvla-file-storage"
+    DVLA_UPLOAD_BUCKET_NAME = "development-dvla-file-per-job"
 
 
 class Test(Config):
@@ -80,23 +79,27 @@ class Test(Config):
     STATSD_HOST = "localhost"
     STATSD_PORT = 1000
     LOCAL_FILE_STORAGE_PATH = "/tmp/dvla-file-storage"
+    DVLA_UPLOAD_BUCKET_NAME = "test-dvla-file-per-job"
 
 
 class Preview(Config):
     NOTIFY_ENVIRONMENT = 'preview'
     CSV_UPLOAD_BUCKET_NAME = 'preview-notifications-csv-upload'
+    DVLA_UPLOAD_BUCKET_NAME = "preview-dvla-file-per-job"
 
 
 class Staging(Config):
     NOTIFY_ENVIRONMENT = 'staging'
     CSV_UPLOAD_BUCKET_NAME = 'staging-notify-csv-upload'
     STATSD_ENABLED = True
+    DVLA_UPLOAD_BUCKET_NAME = "staging-dvla-file-per-job"
 
 
 class Live(Config):
     NOTIFY_ENVIRONMENT = 'live'
     CSV_UPLOAD_BUCKET_NAME = 'live-notifications-csv-upload'
     STATSD_ENABLED = True
+    DVLA_UPLOAD_BUCKET_NAME = "production-dvla-file-per-job"
 
 
 configs = {
