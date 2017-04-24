@@ -30,7 +30,8 @@ def send_files_to_dvla(jobs_ids):
         dvla_file, successful_jobs, failures = concat_files()
         failed_jobs += [job_id_from_filename(failed_file) for failed_file in failures]
 
-        ftp_client.send_file("{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], dvla_file))
+        if successful_jobs:
+            ftp_client.send_file("{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], dvla_file))
 
         for successful_job in successful_jobs:
             notify_celery.send_task(
