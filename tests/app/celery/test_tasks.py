@@ -221,3 +221,40 @@ def test_should_update_all_tasks_as_failed_if_ftp_fails(client, mocker):
             call(name="update-letter-job-to-error", args=("3872ce4a-8817-44b9-bca6-972ac6706b59",), queue="notify"),
             call(name="update-letter-job-to-error", args=("c278d13c-40cf-4091-ac88-3ef6eaeae4e8",), queue="notify")
         ]
+
+
+def test_should_not_try_and_send_a_file_if_all_jobs_failed(client, mocker):
+    with freeze_time('2016-01-01T17:00:00'):
+        def side_effect():
+            return \
+                "DVLA-FILE", \
+                [], \
+                [
+                    "0d0a0398-4c68-4c8d-9790-5d9632ecb1da",
+                    "3872ce4a-8817-44b9-bca6-972ac6706b59",
+                    "c278d13c-40cf-4091-ac88-3ef6eaeae4e8"
+                ]
+
+        def failed_to_download(*args, **kwargs):
+            return True
+
+        mocker.patch('app.celery.tasks.ensure_local_file_directory')
+        mocker.patch('app.celery.tasks.get_file_from_s3', side_effect=failed_to_download)
+        mocker.patch('app.celery.tasks.concat_files', side_effect=side_effect)
+        mocker.patch('app.celery.tasks.remove_local_file_directory')
+        mocker.patch('app.celery.tasks.ftp_client.send_file')
+        mocker.patch('app.notify_celery.send_task')
+
+        send_files_to_dvla([
+            "0d0a0398-4c68-4c8d-9790-5d9632ecb1da",
+            "3872ce4a-8817-44b9-bca6-972ac6706b59",
+            "c278d13c-40cf-4091-ac88-3ef6eaeae4e8"])
+
+        assert app.notify_celery.send_task.call_args_list == [
+            call(name="update-letter-job-to-error", args=("0d0a0398-4c68-4c8d-9790-5d9632ecb1da",), queue="notify"),
+            call(name="update-letter-job-to-error", args=("3872ce4a-8817-44b9-bca6-972ac6706b59",), queue="notify"),
+            call(name="update-letter-job-to-error", args=("c278d13c-40cf-4091-ac88-3ef6eaeae4e8",), queue="notify")
+        ]
+
+        assert not app.celery.tasks.ftp_client.send_file.called
+
