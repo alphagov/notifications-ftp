@@ -257,4 +257,3 @@ def test_should_not_try_and_send_a_file_if_all_jobs_failed(client, mocker):
         ]
 
         assert not app.celery.tasks.ftp_client.send_file.called
-
