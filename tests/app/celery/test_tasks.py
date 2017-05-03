@@ -226,14 +226,15 @@ def test_should_update_all_tasks_as_failed_if_ftp_fails(client, mocker):
 def test_should_not_try_and_send_a_file_if_all_jobs_failed(client, mocker):
     with freeze_time('2016-01-01T17:00:00'):
         def side_effect():
-            return \
-                "DVLA-FILE", \
-                [], \
+            return (
+                "DVLA-FILE",
+                [],
                 [
                     "0d0a0398-4c68-4c8d-9790-5d9632ecb1da",
                     "3872ce4a-8817-44b9-bca6-972ac6706b59",
                     "c278d13c-40cf-4091-ac88-3ef6eaeae4e8"
                 ]
+            )
 
         def failed_to_download(*args, **kwargs):
             return True
