@@ -31,7 +31,7 @@ class Config(object):
     BROKER_TRANSPORT_OPTIONS = {
         'region': AWS_REGION,
         'polling_interval': 1,
-        'visibility_timeout': 14410,
+        'visibility_timeout': 310,
         'queue_name_prefix': NOTIFICATION_QUEUE_PREFIX
     }
     CELERY_ENABLE_UTC = True,
@@ -43,11 +43,11 @@ class Config(object):
         'run-scheduled-jobs': {
             'task': 'test',
             'schedule': crontab(minute=30),
-            'options': {'queue': 'process-ftp'}
+            'options': {'queue': 'process-ftp-tasks'}
         },
     }
     CELERY_QUEUES = [
-        Queue('process-ftp', Exchange('default'), routing_key='process-ftp')
+        Queue('process-ftp-tasks', Exchange('default'), routing_key='process-ftp-tasks')
     ]
 
     STATSD_ENABLED = False
