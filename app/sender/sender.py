@@ -28,5 +28,5 @@ def send_file():
 @sender_blueprint.route('/test-s3', methods=['GET'])
 def test_s3():
     request.args.getlist('job_id')
-    send_files_to_dvla.apply_async([request.args.getlist('job_id')], queue='process-ftp')
+    send_files_to_dvla.apply_async([request.args.getlist('job_id')], queue='process-ftp-tasks')
     return jsonify(result="success"), 200
