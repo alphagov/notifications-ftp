@@ -14,11 +14,6 @@ from app.sftp.ftp_client import FtpException
 NOTIFY_QUEUE = 'notify-internal-tasks'
 
 
-@notify_celery.task(name="test")
-def test():
-    current_app.logger.info("running task")
-
-
 @notify_celery.task(name="send-files-to-dvla")
 @statsd(namespace="tasks")
 def send_files_to_dvla(jobs_ids):

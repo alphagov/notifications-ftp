@@ -16,5 +16,4 @@ function stop
 }
 
 stop "notifications-ftp"
-stop "notifications-ftp-celery-beat"
 stop "notifications-ftp-celery-worker"

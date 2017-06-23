@@ -39,13 +39,6 @@ class Config(object):
     CELERY_ACCEPT_CONTENT = ['json']
     CELERY_TASK_SERIALIZER = 'json'
     CELERY_IMPORTS = ('app.celery.tasks', )
-    CELERYBEAT_SCHEDULE = {
-        'run-scheduled-jobs': {
-            'task': 'test',
-            'schedule': crontab(minute=30),
-            'options': {'queue': 'process-ftp-tasks'}
-        },
-    }
     CELERY_QUEUES = [
         Queue('process-ftp-tasks', Exchange('default'), routing_key='process-ftp-tasks')
     ]
