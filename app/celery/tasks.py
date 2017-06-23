@@ -1,6 +1,5 @@
 from app import notify_celery, ftp_client
 from flask import current_app
-from boto3 import resource
 from app.files.file_utils import (
     get_file_from_s3,
     job_id_from_filename,
@@ -10,6 +9,9 @@ from app.files.file_utils import (
 )
 from app.statsd_decorators import statsd
 from app.sftp.ftp_client import FtpException
+
+
+NOTIFY_QUEUE = 'notify-internal-tasks'
 
 
 @notify_celery.task(name="test")
@@ -35,16 +37,16 @@ def send_files_to_dvla(jobs_ids):
 
         for successful_job in successful_jobs:
             notify_celery.send_task(
-                name="update-letter-job-to-sent", args=(job_id_from_filename(successful_job),), queue="notify"
+                name="update-letter-job-to-sent", args=(job_id_from_filename(successful_job),), queue=NOTIFY_QUEUE
             )
         for failed_job in failed_jobs:
             notify_celery.send_task(
-                name="update-letter-job-to-error", args=(failed_job,), queue="notify"
+                name="update-letter-job-to-error", args=(failed_job,), queue=NOTIFY_QUEUE
             )
-    except FtpException as e:
+    except FtpException:
         for job_id in jobs_ids:
             notify_celery.send_task(
-                name="update-letter-job-to-error", args=(job_id,), queue="notify"
+                name="update-letter-job-to-error", args=(job_id,), queue=NOTIFY_QUEUE
             )
     finally:
         remove_local_file_directory()

@@ -139,9 +139,21 @@ def test_should_update_success_tasks_with_succesfully_processed_files(client, mo
         app.celery.tasks.concat_files.assert_called_once_with()
         app.celery.tasks.ftp_client.send_file.assert_called_once_with("/tmp/dvla-file-storage/DVLA-FILE")
         assert app.notify_celery.send_task.call_args_list == [
-            call(name="update-letter-job-to-sent", args=("1",), queue="notify"),
-            call(name="update-letter-job-to-sent", args=("2",), queue="notify"),
-            call(name="update-letter-job-to-sent", args=("3",), queue="notify")
+            call(
+                name="update-letter-job-to-sent",
+                args=("1",),
+                queue="notify-internal-tasks"
+            ),
+            call(
+                name="update-letter-job-to-sent",
+                args=("2",),
+                queue="notify-internal-tasks"
+            ),
+            call(
+                name="update-letter-job-to-sent",
+                args=("3",),
+                queue="notify-internal-tasks"
+            )
         ]
         app.celery.tasks.remove_local_file_directory.assert_called_once_with()
 
@@ -161,9 +173,21 @@ def test_should_update_failed_tasks_with_unsuccesfully_processed_files(client, m
         send_files_to_dvla(["1", "2", "3"])
 
         assert app.notify_celery.send_task.call_args_list == [
-            call(name="update-letter-job-to-sent", args=("2",), queue="notify"),
-            call(name="update-letter-job-to-error", args=("1",), queue="notify"),
-            call(name="update-letter-job-to-error", args=("3",), queue="notify")
+            call(
+                name="update-letter-job-to-sent",
+                args=("2",),
+                queue="notify-internal-tasks"
+            ),
+            call(
+                name="update-letter-job-to-error",
+                args=("1",),
+                queue="notify-internal-tasks"
+            ),
+            call(
+                name="update-letter-job-to-error",
+                args=("3",),
+                queue="notify-internal-tasks"
+            )
         ]
 
 
@@ -190,9 +214,21 @@ def test_should_update_failed_tasks_with_unsuccesfully_processed_files_and_faile
             "c278d13c-40cf-4091-ac88-3ef6eaeae4e8"])
 
         assert app.notify_celery.send_task.call_args_list == [
-            call(name="update-letter-job-to-sent", args=("3872ce4a-8817-44b9-bca6-972ac6706b59",), queue="notify"),
-            call(name="update-letter-job-to-error", args=("0d0a0398-4c68-4c8d-9790-5d9632ecb1da",), queue="notify"),
-            call(name="update-letter-job-to-error", args=("c278d13c-40cf-4091-ac88-3ef6eaeae4e8",), queue="notify")
+            call(
+                name="update-letter-job-to-sent",
+                args=("3872ce4a-8817-44b9-bca6-972ac6706b59",),
+                queue="notify-internal-tasks"
+            ),
+            call(
+                name="update-letter-job-to-error",
+                args=("0d0a0398-4c68-4c8d-9790-5d9632ecb1da",),
+                queue="notify-internal-tasks"
+            ),
+            call(
+                name="update-letter-job-to-error",
+                args=("c278d13c-40cf-4091-ac88-3ef6eaeae4e8",),
+                queue="notify-internal-tasks"
+            )
         ]
 
 
@@ -217,9 +253,21 @@ def test_should_update_all_tasks_as_failed_if_ftp_fails(client, mocker):
             "c278d13c-40cf-4091-ac88-3ef6eaeae4e8"])
 
         assert app.notify_celery.send_task.call_args_list == [
-            call(name="update-letter-job-to-error", args=("0d0a0398-4c68-4c8d-9790-5d9632ecb1da",), queue="notify"),
-            call(name="update-letter-job-to-error", args=("3872ce4a-8817-44b9-bca6-972ac6706b59",), queue="notify"),
-            call(name="update-letter-job-to-error", args=("c278d13c-40cf-4091-ac88-3ef6eaeae4e8",), queue="notify")
+            call(
+                name="update-letter-job-to-error",
+                args=("0d0a0398-4c68-4c8d-9790-5d9632ecb1da",),
+                queue="notify-internal-tasks"
+            ),
+            call(
+                name="update-letter-job-to-error",
+                args=("3872ce4a-8817-44b9-bca6-972ac6706b59",),
+                queue="notify-internal-tasks"
+            ),
+            call(
+                name="update-letter-job-to-error",
+                args=("c278d13c-40cf-4091-ac88-3ef6eaeae4e8",),
+                queue="notify-internal-tasks"
+            )
         ]
 
 
@@ -252,9 +300,21 @@ def test_should_not_try_and_send_a_file_if_all_jobs_failed(client, mocker):
             "c278d13c-40cf-4091-ac88-3ef6eaeae4e8"])
 
         assert app.notify_celery.send_task.call_args_list == [
-            call(name="update-letter-job-to-error", args=("0d0a0398-4c68-4c8d-9790-5d9632ecb1da",), queue="notify"),
-            call(name="update-letter-job-to-error", args=("3872ce4a-8817-44b9-bca6-972ac6706b59",), queue="notify"),
-            call(name="update-letter-job-to-error", args=("c278d13c-40cf-4091-ac88-3ef6eaeae4e8",), queue="notify")
+            call(
+                name="update-letter-job-to-error",
+                args=("0d0a0398-4c68-4c8d-9790-5d9632ecb1da",),
+                queue="notify-internal-tasks"
+            ),
+            call(
+                name="update-letter-job-to-error",
+                args=("3872ce4a-8817-44b9-bca6-972ac6706b59",),
+                queue="notify-internal-tasks"
+            ),
+            call(
+                name="update-letter-job-to-error",
+                args=("c278d13c-40cf-4091-ac88-3ef6eaeae4e8",),
+                queue="notify-internal-tasks"
+            )
         ]
 
         assert not app.celery.tasks.ftp_client.send_file.called
