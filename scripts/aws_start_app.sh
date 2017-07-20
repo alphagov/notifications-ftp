@@ -14,4 +14,3 @@ function start
 
 start "notifications-ftp"
 start "notifications-ftp-celery-worker"
-start "notifications-ftp-celery-beat"

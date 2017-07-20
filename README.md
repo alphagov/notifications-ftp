@@ -39,12 +39,6 @@ Celery queue reader
 scripts/run_celery.sh
 ```
 
-Celery scheduled tasks
-
-```
-scripts/run_celery_beat.sh
-```
-
 
 ##  To test the application
 
