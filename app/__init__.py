@@ -7,11 +7,10 @@ from flask import (
     Flask,
     request,
     jsonify,
-    g,
-    url_for
+    g
 )
+from notifications_utils import logging
 from notifications_utils.clients.statsd.statsd_client import StatsdClient
-
 notify_celery = NotifyCelery()
 statsd_client = StatsdClient()
 ftp_client = FtpClient()
@@ -30,6 +29,7 @@ def create_app():
 
     notify_celery.init_app(application)
     statsd_client.init_app(application)
+    logging.init_app(application, statsd_client)
     ftp_client.init_app(application, statsd_client)
 
     from app.status.status import status_blueprint
