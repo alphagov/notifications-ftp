@@ -1,4 +1,5 @@
 from celery import Celery, Task
+from flask import current_app
 
 
 class NotifyTask(Task):
