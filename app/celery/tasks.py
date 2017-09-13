@@ -17,6 +17,12 @@ NOTIFY_QUEUE = 'notify-internal-tasks'
 @notify_celery.task(name="send-files-to-dvla")
 @statsd(namespace="tasks")
 def send_files_to_dvla(jobs_ids):
+    send_jobs_to_dvla(jobs_ids)
+
+
+@notify_celery.task(name="send-jobs-to-dvla")
+@statsd(namespace="tasks")
+def send_jobs_to_dvla(jobs_ids):
     try:
         failed_jobs = []
         ensure_local_file_directory()
