@@ -1,7 +1,6 @@
-from datetime import timedelta
-from celery.schedules import crontab
-from kombu import Exchange, Queue
 import os
+
+from kombu import Exchange, Queue
 
 
 class Config(object):
@@ -34,7 +33,7 @@ class Config(object):
         'visibility_timeout': 310,
         'queue_name_prefix': NOTIFICATION_QUEUE_PREFIX
     }
-    CELERY_ENABLE_UTC = True,
+    CELERY_ENABLE_UTC = True
     CELERY_TIMEZONE = 'Europe/London'
     CELERY_ACCEPT_CONTENT = ['json']
     CELERY_TASK_SERIALIZER = 'json'
@@ -49,6 +48,8 @@ class Config(object):
 
     LOCAL_FILE_STORAGE_PATH = "~/dvla-file-storage"
 
+    DVLA_JOB_BUCKET_NAME = None
+    DVLA_API_BUCKET_NAME = None
 
 ######################
 # Config overrides ###
@@ -56,49 +57,53 @@ class Config(object):
 
 
 class Development(Config):
-    CSV_UPLOAD_BUCKET_NAME = 'development-notifications-csv-upload'
     NOTIFY_ENVIRONMENT = 'development'
     NOTIFICATION_QUEUE_PREFIX = 'development'
     DEBUG = True
     LOCAL_FILE_STORAGE_PATH = "/tmp/dvla-file-storage"
-    DVLA_UPLOAD_BUCKET_NAME = "development-dvla-file-per-job"
 
+    DVLA_JOB_BUCKET_NAME = 'development-dvla-file-per-job'
+    DVLA_API_BUCKET_NAME = 'development-dvla-letter-api-files'
 
 class Test(Config):
     NOTIFY_ENVIRONMENT = 'test'
-    CSV_UPLOAD_BUCKET_NAME = 'test-notifications-csv-upload'
     DEBUG = True
     STATSD_ENABLED = True
     STATSD_HOST = "localhost"
     STATSD_PORT = 1000
     LOCAL_FILE_STORAGE_PATH = "/tmp/dvla-file-storage"
-    DVLA_UPLOAD_BUCKET_NAME = "test-dvla-file-per-job"
+
+    DVLA_JOB_BUCKET_NAME = 'test-dvla-file-per-job'
+    DVLA_API_BUCKET_NAME = 'test-dvla-letter-api-files'
 
 
 class Preview(Config):
     NOTIFY_ENVIRONMENT = 'preview'
-    CSV_UPLOAD_BUCKET_NAME = 'preview-notifications-csv-upload'
-    DVLA_UPLOAD_BUCKET_NAME = "preview-dvla-file-per-job"
+
+    DVLA_JOB_BUCKET_NAME = 'preview-dvla-file-per-job'
+    DVLA_API_BUCKET_NAME = 'preview-dvla-letter-api-files'
 
 
 class Staging(Config):
     NOTIFY_ENVIRONMENT = 'staging'
-    CSV_UPLOAD_BUCKET_NAME = 'staging-notify-csv-upload'
     STATSD_ENABLED = True
-    DVLA_UPLOAD_BUCKET_NAME = "staging-dvla-file-per-job"
+
+    DVLA_JOB_BUCKET_NAME = 'staging-dvla-file-per-job'
+    DVLA_API_BUCKET_NAME = 'staging-dvla-letter-api-files'
 
 
-class Live(Config):
-    NOTIFY_ENVIRONMENT = 'live'
-    CSV_UPLOAD_BUCKET_NAME = 'live-notifications-csv-upload'
+class Production(Config):
+    NOTIFY_ENVIRONMENT = 'production'
     STATSD_ENABLED = True
-    DVLA_UPLOAD_BUCKET_NAME = "production-dvla-file-per-job"
+
+    DVLA_JOB_BUCKET_NAME = 'production-dvla-file-per-job'
+    DVLA_API_BUCKET_NAME = 'production-dvla-letter-api-files'
 
 
 configs = {
     'development': Development,
     'test': Test,
-    'live': Live,
+    'preview': Preview,
     'staging': Staging,
-    'preview': Preview
+    'production': Production,
 }
