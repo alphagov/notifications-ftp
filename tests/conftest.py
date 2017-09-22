@@ -1,9 +1,10 @@
-import pytest
-from app import create_app
 import os
-from flask import current_app
 import shutil
-from app.files.file_utils import ensure_local_file_directory
+
+import pytest
+from flask import current_app
+
+from app import create_app
 
 
 @pytest.fixture(scope='session')

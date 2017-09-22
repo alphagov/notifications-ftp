@@ -1,146 +1,146 @@
+from pathlib import Path
 import os
+from unittest.mock import Mock
+
+import pytest
 from flask import current_app
 from freezegun import freeze_time
-import pytest
 from app.files.file_utils import (
-    create_local_file_directory,
-    ensure_local_file_directory,
-    concat_files,
+    get_dvla_file_name,
     job_file_name_for_job,
-    dvla_file_name_for_concatenated_file,
-    remove_local_file_directory,
-    job_id_from_filename,
-    get_file_from_s3
+    get_job_from_s3,
+    get_api_from_s3,
+    _get_file_from_s3,
+    concat_files,
+    rename_api_file,
+    get_notification_references,
+    LocalDir
 )
 
 
-def test_should_return_true_on_successful_s3_download(client, mocker):
-    class Foo():
-        def download_fileobj(self, bucket_name, filename, job_file):
-            assert bucket_name == "bucket"
-            assert filename == "job_id-dvla-job.text"
-            assert job_file.name == "/tmp/dvla-file-storage/job_id-dvla-job.text"
-
-    ensure_local_file_directory()
-    mocker.patch('app.files.file_utils.boto3.client', return_value=Foo())
-    assert get_file_from_s3("bucket", "job_id")
+FOO_SUBFOLDER = '/tmp/dvla-file-storage/foo'
 
 
-def test_should_return_false_on_failed_s3_download(client, mocker):
-    class Foo():
-        def download_fileobj(self, bucket_name, filename, job_file):
-            raise Exception("Failed to do S3")
-
-    ensure_local_file_directory()
-    mocker.patch('app.files.file_utils.boto3.client', return_value=Foo())
-    assert not get_file_from_s3("bucket", "job_id")
+@pytest.fixture
+def local_job_dir(client):
+    with LocalDir('job') as job_folder:
+        yield job_folder
 
 
-def test_dvla_file_name_for_concatanted_file():
+@pytest.fixture
+def local_api_dir(client):
+    with LocalDir('api') as api_folder:
+        yield api_folder
+
+
+def test_get_file_from_s3_should_return_filename_on_successful_s3_download(local_job_dir, mocker):
+    s3_mock = Mock()
+    mocker.patch('app.files.file_utils.boto3.client', return_value=s3_mock)
+
+    ret = _get_file_from_s3('bucket', 'job', 'foo.txt')
+
+    assert ret == '/tmp/dvla-file-storage/job/foo.txt'
+    assert s3_mock.download_fileobj.call_args[0][0] == 'bucket'
+    assert s3_mock.download_fileobj.call_args[0][1] == 'foo.txt'
+    # 3rd arg is file pointer
+    assert s3_mock.download_fileobj.call_args[0][2].name == '/tmp/dvla-file-storage/job/foo.txt'
+
+
+def test_get_job_from_s3_should_get_correct_file_to_download(local_job_dir, mocker):
+    mocked = mocker.patch('app.files.file_utils._get_file_from_s3')
+
+    get_job_from_s3('1234')
+
+    mocked.assert_called_once_with(
+        'test-dvla-file-per-job',
+        'job',
+        '1234-dvla-job.text'
+    )
+
+
+def test_get_api_from_s3_should_get_correct_file_to_download(local_api_dir, mocker):
+    mocked = mocker.patch('app.files.file_utils._get_file_from_s3')
+
+    get_api_from_s3('2017-01-01T12:34:56Z.txt')
+
+    mocked.assert_called_once_with(
+        'test-dvla-letter-api-files',
+        'api',
+        '2017-01-01T12:34:56Z.txt'
+    )
+
+
+def test_get_dvla_file_name():
     with freeze_time('2016-01-01T17:00:00'):
-        assert dvla_file_name_for_concatenated_file() == "Notify-201601011700-rq.txt"
+        assert get_dvla_file_name() == "Notify-201601011700-rq.txt"
 
 
 def test_should_make_job_filename_from_job_id():
     assert job_file_name_for_job("3872ce4a-8817-44b9-bca6-972ac6706b59") == "3872ce4a-8817-44b9-bca6-972ac6706b59-dvla-job.text"  # noqa
 
 
-def test_should_make_job_id_from_job_filename():
-    assert job_id_from_filename("3872ce4a-8817-44b9-bca6-972ac6706b59-dvla-job.text") == "3872ce4a-8817-44b9-bca6-972ac6706b59"  # noqa
-
-
-def test_should_create_directory_for_dval_files(client):
-    assert not os.path.exists(current_app.config['LOCAL_FILE_STORAGE_PATH'])
-    ensure_local_file_directory()
-    assert os.path.exists(current_app.config['LOCAL_FILE_STORAGE_PATH'])
-
-
-def test_should_delete_all_files(client):
-    ensure_local_file_directory()
+def test_concat_files_only_concats_provided_files(local_job_dir):
+    subfolder = Path(local_job_dir)
     files = ['file-1', 'file-2', 'file-3']
-    ensure_local_file_directory()
-    for file in files:
-        with open("{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], file), 'w+') as test_file:
-            test_file.write(file + "\n")
 
-    assert len(os.listdir(current_app.config['LOCAL_FILE_STORAGE_PATH'])) == 3
-    remove_local_file_directory()
-    assert not os.path.exists(current_app.config['LOCAL_FILE_STORAGE_PATH'])
+    for filename in files:
+        with (subfolder / filename).open('w') as test_file:
+            test_file.write(filename + "\n")
 
-
-def test_should_delete_all_files_should_handle_case_where_folder_doesnt_exist(client):
-    remove_local_file_directory()
-    assert not os.path.exists(current_app.config['LOCAL_FILE_STORAGE_PATH'])
-
-
-def test_should_delete_all_files_should_handle_case_where_folder_has_no_files(client):
-    ensure_local_file_directory()
-    remove_local_file_directory()
-    assert not os.path.exists(current_app.config['LOCAL_FILE_STORAGE_PATH'])
-
-
-def test_should_create_single_file_from_all_files_in_directory(client):
     with freeze_time('2016-01-01T17:00:00'):
-        files = ['file-1', 'file-2', 'file-3']
-        ensure_local_file_directory()
-        for file in files:
-            with open("{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], file), 'w+') as test_file:
-                test_file.write(file + "\n")
+        dvla_filename = concat_files(['file-1', 'file-2'])
 
-        filename, success, failure = concat_files()
+    assert dvla_filename == "Notify-201601011700-rq.txt"
 
-        assert filename == "Notify-201601011700-rq.txt"
-
-        with open(
-                "{}/Notify-201601011700-rq.txt".format(current_app.config['LOCAL_FILE_STORAGE_PATH'])
-        ) as concat_file:
-            lines = [line.rstrip() for line in concat_file.readlines()]
-            assert len(lines) == 3
-            assert 'file-1' in lines
-            assert 'file-2' in lines
-            assert 'file-3' in lines
+    with (subfolder / dvla_filename).open() as concat_file:
+        assert concat_file.read() == 'file-1\nfile-2\n'
 
 
-def test_should_leave_an_empty_directory_if_no_files_in_directory(client):
+def test_local_dir_creates_directory_if_not_present_and_then_removes_at_end(client):
+    assert not os.path.exists(FOO_SUBFOLDER)
+    with LocalDir('foo') as foo:
+        assert os.path.exists(FOO_SUBFOLDER)
+    assert not os.path.exists(FOO_SUBFOLDER)
+
+
+def test_local_dir_keeps_directory_if_present_but_still_removes_at_end(client):
+    os.makedirs(FOO_SUBFOLDER)
+    with LocalDir('foo') as foo:
+        assert os.path.exists(FOO_SUBFOLDER)
+    assert not os.path.exists(FOO_SUBFOLDER)
+
+
+def test_local_dir_removes_even_if_files_present(client):
+    with LocalDir('foo') as foo:
+        with (foo / 'a.txt').open('w') as test_file:
+            test_file.write('test\n')
+        assert len(os.listdir(FOO_SUBFOLDER)) == 1
+    assert not os.path.exists(FOO_SUBFOLDER)
+
+
+def test_rename_api_file(local_api_dir):
+    with (local_api_dir / 'foo.txt').open('w') as test_file:
+        test_file.write('test\n')
+
     with freeze_time('2016-01-01T17:00:00'):
-        ensure_local_file_directory()
-        concat_files()
-        assert len(os.listdir(current_app.config['LOCAL_FILE_STORAGE_PATH'])) == 0
+        dvla_filename = rename_api_file('foo.txt')
+    assert dvla_filename.name == "Notify-201601011700-rq.txt"
+
+    with (local_api_dir / dvla_filename).open() as dvla_file:
+        assert dvla_file.read() == 'test\n'
 
 
-def test_should_return_filenames_grouped_by_success(client):
-    with freeze_time('2016-01-01T17:00:00'):
-        files = ['file-1', 'file-2', 'file-3']
-        ensure_local_file_directory()
-        for file in files:
-            with open("{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], file), 'w+') as test_file:
-                test_file.write(file + "\n")
+def test_get_notification_references_gets_references_from_file(local_api_dir):
+    dvla_file_contents = '\n'.join([
+        '140|001|001||ABC0000000000000|||||||||||||1||2|3|4|5|6|WC2B 6NH|||||||||hello',
+        '140|001|001||DEF0000000000000|||||||||||||1||2|3|4|5|6|WC2B 6NH|||||||||hello',
+        '140|001|001||GHI0000000000000|||||||||||||1||2|3|4|5|6|WC2B 6NH|||||||||hello',
+        ''
+    ])
+    filename = (local_api_dir / 'foo.txt')
+    with filename.open('w') as test_file:
+        test_file.write(dvla_file_contents)
 
-        filename, success, failure = concat_files()
+    refs = get_notification_references(filename)
 
-        assert filename == "Notify-201601011700-rq.txt"
-        assert 'file-1' in success
-        assert 'file-2' in success
-        assert 'file-3' in success
-        assert failure == []
-
-
-def test_should_return_filenames_grouped_by_success_and_failure(client, mocker):
-    with freeze_time('2016-01-01T17:00:00'):
-        def side_effect(*args, **kwargs):
-            if 'file-3' in args[0].name:
-                raise Exception("FILE FAILED")
-
-        mocker.patch('app.files.file_utils.copyfileobj', side_effect=side_effect)
-
-        files = ['file-1', 'file-2', 'file-3']
-        ensure_local_file_directory()
-        for file in files:
-            with open("{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], file), 'w+') as test_file:
-                test_file.write(file + "\n")
-
-        filename, success, failure = concat_files()
-        assert filename == "Notify-201601011700-rq.txt"
-        assert 'file-1' in success
-        assert 'file-2' in success
-        assert 'file-3' in failure
+    assert refs == ['ABC0000000000000', 'DEF0000000000000', 'GHI0000000000000']

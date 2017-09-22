@@ -65,6 +65,7 @@ class Development(Config):
     DVLA_JOB_BUCKET_NAME = 'development-dvla-file-per-job'
     DVLA_API_BUCKET_NAME = 'development-dvla-letter-api-files'
 
+
 class Test(Config):
     NOTIFY_ENVIRONMENT = 'test'
     DEBUG = True
