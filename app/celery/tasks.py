@@ -28,7 +28,7 @@ def send_jobs_to_dvla(job_ids):
     try:
         with LocalDir('job') as job_folder:
             job_filenames = [get_job_from_s3(job_id) for job_id in job_ids]
-
+            current_app.logger.info('Sending {} to dvla'.format(job_filenames))
             dvla_file = concat_files(job_filenames)
 
             ftp_client.send_file(str(job_folder / dvla_file))
@@ -53,6 +53,14 @@ def send_api_notifications_to_dvla(filename):
 
         dvla_file = rename_api_file(filename)
 
+        notification_references = get_notification_references(dvla_file)
+        current_app.logger.info(
+            'Sending {} notifications from {} to dvla'.format(
+                len(notification_references),
+                filename
+            )
+        )
+
         try:
             ftp_client.send_file(str(api_folder / dvla_file))
         except FtpException:
@@ -61,8 +69,6 @@ def send_api_notifications_to_dvla(filename):
             task_name = "update-letter-notifications-to-error"
         else:
             task_name = "update-letter-notifications-to-sent"
-
-        notification_references = get_notification_references(dvla_file)
 
         notify_celery.send_task(
             name=task_name, args=(notification_references,), queue=NOTIFY_QUEUE
