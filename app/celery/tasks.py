@@ -42,3 +42,28 @@ def send_jobs_to_dvla(job_ids):
             notify_celery.send_task(
                 name=task_name, args=(job_id,), queue=NOTIFY_QUEUE
             )
+
+
+@notify_celery.task(name="send-api-notifications-to-dvla")
+@statsd(namespace="tasks")
+def send_api_notifications_to_dvla(filename):
+    # get pipe file from S3
+    with LocalDir('api') as api_folder:
+        get_api_from_s3(filename)
+
+        dvla_file = rename_api_file(filename)
+
+        try:
+            ftp_client.send_file(str(api_folder / dvla_file))
+        except FtpException:
+            # if there's an s3 error we won't know what notifications to update, so only worry about FTP issues
+            current_app.logger.exception('FTP app failed to send api messages')
+            task_name = "update-letter-notifications-to-error"
+        else:
+            task_name = "update-letter-notifications-to-sent"
+
+        notification_references = get_notification_references(dvla_file)
+
+        notify_celery.send_task(
+            name=task_name, args=(notification_references,), queue=NOTIFY_QUEUE
+        )
