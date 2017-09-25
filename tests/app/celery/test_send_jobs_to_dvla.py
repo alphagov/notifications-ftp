@@ -74,7 +74,7 @@ def test_should_update_success_tasks_with_succesfully_processed_files(mocks):
 
 
 def test_should_update_failed_tasks_if_s3_error(mocks):
-    mocks.get_job_from_s3.side_effect = S3Error)
+    mocks.get_job_from_s3.side_effect = S3Error
 
     send_jobs_to_dvla(["1", "2", "3"])
 

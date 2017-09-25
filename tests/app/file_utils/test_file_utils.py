@@ -39,10 +39,10 @@ def test_get_file_from_s3_should_return_filename_on_successful_s3_download(local
 
     ret = _get_file_from_s3('bucket', 'job', 'foo.txt')
 
-    assert ret == '/tmp/dvla-file-storage/job/foo.txt'
+    assert ret == 'foo.txt'
     assert s3_mock.download_fileobj.call_args[0][0] == 'bucket'
     assert s3_mock.download_fileobj.call_args[0][1] == 'foo.txt'
-    # 3rd arg is file pointer
+    # 3rd arg is location to download to
     assert s3_mock.download_fileobj.call_args[0][2].name == '/tmp/dvla-file-storage/job/foo.txt'
 
 

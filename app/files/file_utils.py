@@ -35,11 +35,11 @@ def _get_file_from_s3(bucket_name, subfolder, filename):
     output_filename = full_path_to_file(subfolder, filename)
     with open(output_filename, 'wb+') as out_file:
         s3.download_fileobj(bucket_name, filename, out_file)
-    return output_filename
+    return filename
 
 
 def full_path_to_file(subfolder, filename):
-    return "{}/{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], subfolder, filename)
+    return str(Path(current_app.config['LOCAL_FILE_STORAGE_PATH']) / subfolder / filename)
 
 
 def concat_files(filenames):
