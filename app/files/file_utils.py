@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 from shutil import (
     copyfileobj,
     rmtree
@@ -10,8 +10,19 @@ from flask import current_app
 import boto3
 
 
-def get_dvla_file_name():
-    return "Notify-{}-rq.txt".format(datetime.utcnow().strftime("%Y%m%d%H%M"))
+DVLA_FILENAME_FORMAT = 'Notify-%Y%m%d%H%M-rq.txt'
+
+
+def get_dvla_file_name(dt=None):
+    dt = dt or datetime.utcnow()
+    return dt.strftime(DVLA_FILENAME_FORMAT)
+
+
+def get_new_dvla_filename(old_filename):
+    # increment the time by one minute
+    old_datetime = datetime.strptime(old_filename, DVLA_FILENAME_FORMAT)
+
+    return get_dvla_file_name(dt=old_datetime + timedelta(minutes=1))
 
 
 def job_file_name_for_job(job_id):

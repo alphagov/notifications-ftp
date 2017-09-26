@@ -3,10 +3,10 @@ import os
 from unittest.mock import Mock
 
 import pytest
-from flask import current_app
 from freezegun import freeze_time
 from app.files.file_utils import (
     get_dvla_file_name,
+    get_new_dvla_filename,
     job_file_name_for_job,
     get_job_from_s3,
     get_api_from_s3,
@@ -72,11 +72,16 @@ def test_get_api_from_s3_should_get_correct_file_to_download(local_api_dir, mock
 
 def test_get_dvla_file_name():
     with freeze_time('2016-01-01T17:00:00'):
-        assert get_dvla_file_name() == "Notify-201601011700-rq.txt"
+        assert get_dvla_file_name() == 'Notify-201601011700-rq.txt'
+
+
+def test_get_new_dvla_file_name():
+    # increment from 17:59 to 18:00
+    assert get_new_dvla_filename('Notify-201601011759-rq.txt') == 'Notify-201601011800-rq.txt'
 
 
 def test_should_make_job_filename_from_job_id():
-    assert job_file_name_for_job("3872ce4a-8817-44b9-bca6-972ac6706b59") == "3872ce4a-8817-44b9-bca6-972ac6706b59-dvla-job.text"  # noqa
+    assert job_file_name_for_job('3872ce4a-8817-44b9-bca6-972ac6706b59') == '3872ce4a-8817-44b9-bca6-972ac6706b59-dvla-job.text'  # noqa
 
 
 def test_concat_files_only_concats_provided_files(local_job_dir):
