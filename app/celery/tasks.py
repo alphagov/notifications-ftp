@@ -2,10 +2,10 @@ from flask import current_app
 
 from app import notify_celery, ftp_client
 from app.files.file_utils import (
+    get_dvla_file_name,
     get_job_from_s3,
     get_api_from_s3,
     concat_files,
-    rename_api_file,
     LocalDir,
     get_notification_references
 )
@@ -31,7 +31,10 @@ def send_jobs_to_dvla(job_ids):
             current_app.logger.info('Sending {} to dvla'.format(job_filenames))
             dvla_file = concat_files(job_filenames)
 
-            ftp_client.send_file(str(job_folder / dvla_file))
+            ftp_client.send_file(
+                local_filename=str(job_folder / dvla_file),
+                remote_filename=dvla_file
+            )
     except:
         current_app.logger.exception('FTP app failed to send jobs')
         task_name = 'update-letter-job-to-error'
@@ -51,9 +54,7 @@ def send_api_notifications_to_dvla(filename):
     with LocalDir('api') as api_folder:
         get_api_from_s3(filename)
 
-        dvla_file = rename_api_file(filename)
-
-        notification_references = get_notification_references(dvla_file)
+        notification_references = get_notification_references(filename)
         current_app.logger.info(
             'Sending {} notifications from {} to dvla'.format(
                 len(notification_references),
@@ -62,7 +63,10 @@ def send_api_notifications_to_dvla(filename):
         )
 
         try:
-            ftp_client.send_file(str(api_folder / dvla_file))
+            ftp_client.send_file(
+                local_file=str(api_folder / filename),
+                remote_filename=get_dvla_file_name()
+            )
         except FtpException:
             # if there's an s3 error we won't know what notifications to update, so only worry about FTP issues
             current_app.logger.exception('FTP app failed to send api messages')

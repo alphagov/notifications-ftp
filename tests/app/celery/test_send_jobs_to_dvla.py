@@ -1,9 +1,9 @@
 from unittest.mock import call, Mock
 
+from freezegun import freeze_time
 from botocore.exceptions import ClientError as S3Error
 import pytest
 
-import app
 from app.celery.tasks import send_jobs_to_dvla
 from app.sftp.ftp_client import FtpException
 
@@ -15,7 +15,8 @@ def mocks(mocker, client):
         concat_files = mocker.patch('app.celery.tasks.concat_files', return_value='DVLA-FILE')
         send_file = mocker.patch('app.celery.tasks.ftp_client.send_file')
         send_task = mocker.patch('app.notify_celery.send_task')
-    yield SendJobMocks
+    with freeze_time('2017-01-01 17:30'):
+        yield SendJobMocks
 
 
 def test_should_set_up_local_directory_structure(mocks, mocker):
@@ -48,7 +49,10 @@ def test_should_call_concat_files(mocks, mocker):
 def test_should_call_send_ftp_with_dvla_file(mocks):
     send_jobs_to_dvla(["1", "2", "3"])
 
-    mocks.send_file.assert_called_once_with("/tmp/dvla-file-storage/job/DVLA-FILE")
+    mocks.send_file.assert_called_once_with(
+        local_filename='/tmp/dvla-file-storage/job/DVLA-FILE',
+        remote_filename='DVLA-FILE'
+    )
 
 
 def test_should_update_success_tasks_with_succesfully_processed_files(mocks):

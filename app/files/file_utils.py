@@ -80,13 +80,6 @@ def _remove_local_file_directory(subfolder):
         rmtree(folder, ignore_errors=False)
 
 
-def rename_api_file(filename):
-    current = Path(current_app.config['LOCAL_FILE_STORAGE_PATH']) / 'api' / filename
-    new = current.parent / get_dvla_file_name()
-    current.rename(new)
-    return new
-
-
 def get_notification_references(filename):
     with Path(filename).open('r') as dvla_file:
         return [line.split('|')[4] for line in dvla_file.readlines() if line]

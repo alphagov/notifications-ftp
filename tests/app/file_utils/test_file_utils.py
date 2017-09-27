@@ -12,7 +12,6 @@ from app.files.file_utils import (
     get_api_from_s3,
     _get_file_from_s3,
     concat_files,
-    rename_api_file,
     get_notification_references,
     LocalDir
 )
@@ -121,18 +120,6 @@ def test_local_dir_removes_even_if_files_present(client):
             test_file.write('test\n')
         assert len(os.listdir(FOO_SUBFOLDER)) == 1
     assert not os.path.exists(FOO_SUBFOLDER)
-
-
-def test_rename_api_file(local_api_dir):
-    with (local_api_dir / 'foo.txt').open('w') as test_file:
-        test_file.write('test\n')
-
-    with freeze_time('2016-01-01T17:00:00'):
-        dvla_filename = rename_api_file('foo.txt')
-    assert dvla_filename.name == "Notify-201601011700-rq.txt"
-
-    with (local_api_dir / dvla_filename).open() as dvla_file:
-        assert dvla_file.read() == 'test\n'
 
 
 def test_get_notification_references_gets_references_from_file(local_api_dir):
