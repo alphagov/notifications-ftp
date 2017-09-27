@@ -74,6 +74,18 @@ def send_api_notifications_to_dvla(filename):
         else:
             task_name = "update-letter-notifications-to-sent"
 
+        update_notifications(task_name, notification_references)
+
+
+def update_notifications(task_name, references):
+    # split up references into 1000 item sublists to ensure we don't go over SQS's max item size of 256kb
+    for notification_references in chunk_list(references, 1000):
         notify_celery.send_task(
             name=task_name, args=(notification_references,), queue=NOTIFY_QUEUE
         )
+
+
+def chunk_list(items, n):
+    # third parameter is step
+    for i in range(0, len(items), n):
+        yield items[i:i + n]

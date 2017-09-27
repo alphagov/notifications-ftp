@@ -70,3 +70,16 @@ def test_should_update_notifications_if_ftp_error(mocks):
         args=(['1', '2', '3'],),
         queue='notify-internal-tasks'
     )
+
+
+def test_should_update_notifications_to_success_in_1k_batches(mocker, mocks):
+    get_notification_references = mocker.patch(
+        'app.celery.tasks.get_notification_references',
+        return_value=list(range(10000))
+    )
+    send_api_notifications_to_dvla('')
+
+    assert mocks.send_task.call_count == 10
+    assert mocks.send_task.mock_calls[0][2]['args'] == (list(range(1000)),)
+    assert mocks.send_task.mock_calls[1][2]['args'] == (list(range(1000, 2000)),)
+    assert mocks.send_task.mock_calls[2][2]['args'] == (list(range(2000, 3000)),)
