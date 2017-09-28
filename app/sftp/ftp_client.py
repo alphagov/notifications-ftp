@@ -18,15 +18,15 @@ class FtpClient():
         self.password = app.config.get('FTP_PASSWORD')
         self.statsd_client = statsd_client
 
-    def send_file(self, local_filename, remote_filename):
-        filename_without_path = os.path.split(filename)[1]
+    def send_file(self, local_file, remote_filename):
+        filename_without_path = os.path.split(local_file)[1]
         try:
             cnopts = pysftp.CnOpts()
             cnopts.hostkeys = None
             current_app.logger.info("opening connection to {}".format(self.host))
             with pysftp.Connection(self.host, username=self.username, password=self.password, cnopts=cnopts) as sftp:
                 sftp.chdir('notify')
-                current_app.logger.info("uploading {}".format(filename))
+                current_app.logger.info("uploading {}".format(local_file))
 
                 start_time = monotonic()
                 if sftp.exists('{}/{}'.format(sftp.pwd, filename_without_path)):
@@ -40,7 +40,7 @@ class FtpClient():
                 else:
                     remote_filename = filename_without_path
 
-                sftp.put(filename, remotepath='{}/{}'.format(sftp.pwd, remote_filename))
+                sftp.put(local_file, remotepath='{}/{}'.format(sftp.pwd, remote_filename))
 
                 self.statsd_client.timing("ftp-client.upload-time", monotonic() - start_time)
 
