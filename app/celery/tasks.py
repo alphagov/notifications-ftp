@@ -28,8 +28,8 @@ def send_jobs_to_dvla(job_ids):
     try:
         with LocalDir('job') as job_folder:
             job_filenames = [get_job_from_s3(job_id) for job_id in job_ids]
-            current_app.logger.info('Sending {} to dvla'.format(job_filenames))
             dvla_file = concat_files(job_filenames)
+            current_app.logger.info('Sending {} to dvla as {}'.format(job_filenames, dvla_file))
 
             ftp_client.send_file(
                 local_filename=str(job_folder / dvla_file),
