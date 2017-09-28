@@ -32,7 +32,7 @@ def send_jobs_to_dvla(job_ids):
             current_app.logger.info('Sending {} to dvla as {}'.format(job_filenames, dvla_file))
 
             ftp_client.send_file(
-                local_filename=str(job_folder / dvla_file),
+                local_file=str(job_folder / dvla_file),
                 remote_filename=dvla_file
             )
     except:
