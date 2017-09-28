@@ -1,74 +1,97 @@
 import os
-from flask import current_app
-from datetime import datetime
+from pathlib import Path
+from datetime import datetime, timedelta
 from shutil import (
     copyfileobj,
     rmtree
 )
+
+from flask import current_app
 import boto3
 
 
-def dvla_file_name_for_concatenated_file():
-    return "Notify-{}-rq.txt".format(datetime.utcnow().strftime("%Y%m%d%H%M"))
+DVLA_FILENAME_FORMAT = 'Notify-%Y%m%d%H%M-rq.txt'
+
+
+def get_dvla_file_name(dt=None):
+    dt = dt or datetime.utcnow()
+    return dt.strftime(DVLA_FILENAME_FORMAT)
+
+
+def get_new_dvla_filename(old_filename):
+    # increment the time by one minute
+    old_datetime = datetime.strptime(old_filename, DVLA_FILENAME_FORMAT)
+
+    return get_dvla_file_name(dt=old_datetime + timedelta(minutes=1))
 
 
 def job_file_name_for_job(job_id):
     return "{}-dvla-job.text".format(job_id)
 
 
-def job_id_from_filename(job_filename):
-    return job_filename.replace("-dvla-job.text", "")
-
-
-def get_file_from_s3(bucket_name, job_id):
+def get_job_from_s3(job_id):
+    bucket_name = current_app.config['DVLA_JOB_BUCKET_NAME']
     filename = job_file_name_for_job(job_id)
-    try:
-        s3 = boto3.client('s3')
-        with open(full_path_to_file(filename), 'wb+') as job_file:
-            s3.download_fileobj(bucket_name, filename, job_file)
-        return True
-    except Exception:
-        os.remove(full_path_to_file(filename))
-        current_app.logger.exception("Failed to download {}".format(filename))
-        return False
+
+    return _get_file_from_s3(bucket_name, 'job', filename)
 
 
-def full_path_to_file(filename):
-    return "{}/{}".format(current_app.config['LOCAL_FILE_STORAGE_PATH'], filename)
+def get_api_from_s3(filename):
+    bucket_name = current_app.config['DVLA_API_BUCKET_NAME']
+    return _get_file_from_s3(bucket_name, 'api', filename)
 
 
-def concat_files():
-    dvla_filename = dvla_file_name_for_concatenated_file()
-    all_files = os.listdir(current_app.config['LOCAL_FILE_STORAGE_PATH'])
-
-    success = []
-    failure = []
-
-    if len(all_files) > 0:
-        with open(full_path_to_file(dvla_filename), 'w+', encoding="utf-8") as dvla_file:
-            current_app.logger.info("making {}".format(dvla_file.name))
-            for job_file in all_files:
-                try:
-                    with open(full_path_to_file(job_file), 'r', encoding="utf-8") as readfile:
-                        current_app.logger.info("concatenating {}".format(job_file))
-                        copyfileobj(readfile, dvla_file)
-                        success.append(job_file)
-                except Exception:
-                    current_app.logger.exception("Failed to append {}".format(job_file))
-                    failure.append(job_file)
-    return dvla_filename, success, failure
+def _get_file_from_s3(bucket_name, subfolder, filename):
+    s3 = boto3.client('s3')
+    output_filename = full_path_to_file(subfolder, filename)
+    with open(output_filename, 'wb+') as out_file:
+        s3.download_fileobj(bucket_name, filename, out_file)
+    return filename
 
 
-def ensure_local_file_directory():
-    if not os.path.exists(current_app.config['LOCAL_FILE_STORAGE_PATH']):
-        create_local_file_directory()
+def full_path_to_file(subfolder, filename):
+    return str(Path(current_app.config['LOCAL_FILE_STORAGE_PATH']) / subfolder / filename)
 
 
-def create_local_file_directory():
-    if not os.path.exists(current_app.config['LOCAL_FILE_STORAGE_PATH']):
-        os.makedirs(current_app.config['LOCAL_FILE_STORAGE_PATH'])
+def concat_files(filenames):
+    dvla_file_name = get_dvla_file_name()
+    full_path_to_dvla_file = full_path_to_file('job', dvla_file_name)
+
+    with open(full_path_to_dvla_file, 'w+', encoding="utf-8") as dvla_file:
+        current_app.logger.info("making {}".format(dvla_file.name))
+        for job_file in filenames:
+            job_file_path = full_path_to_file('job', job_file)
+            with open(job_file_path, 'r', encoding="utf-8") as readfile:
+                current_app.logger.info("concatenating {}".format(job_file))
+                copyfileobj(readfile, dvla_file)
+    return dvla_file_name
 
 
-def remove_local_file_directory():
-    if os.path.exists(current_app.config['LOCAL_FILE_STORAGE_PATH']):
-        rmtree(current_app.config['LOCAL_FILE_STORAGE_PATH'], ignore_errors=False)
+def _create_local_file_directory(subfolder):
+    folder = '{}/{}'.format(current_app.config['LOCAL_FILE_STORAGE_PATH'], subfolder)
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    return folder
+
+
+def _remove_local_file_directory(subfolder):
+    folder = '{}/{}'.format(current_app.config['LOCAL_FILE_STORAGE_PATH'], subfolder)
+    if os.path.exists(folder):
+        rmtree(folder, ignore_errors=False)
+
+
+def get_notification_references(filename):
+    with Path(filename).open('r') as dvla_file:
+        return [line.split('|')[4] for line in dvla_file.readlines() if line]
+
+
+class LocalDir:
+    def __init__(self, subfolder):
+        self.subfolder = subfolder
+
+    def __enter__(self):
+        new_folder = _create_local_file_directory(self.subfolder)
+        return Path(new_folder)
+
+    def __exit__(self, *args):
+        _remove_local_file_directory(self.subfolder)
