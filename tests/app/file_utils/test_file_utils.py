@@ -129,10 +129,10 @@ def test_get_notification_references_gets_references_from_file(local_api_dir):
         '140|001|001||GHI0000000000000|||||||||||||1||2|3|4|5|6|WC2B 6NH|||||||||hello',
         ''
     ])
-    filename = (local_api_dir / 'foo.txt')
-    with filename.open('w') as test_file:
+    path = (local_api_dir / 'foo.txt')
+    with path.open('w') as test_file:
         test_file.write(dvla_file_contents)
 
-    refs = get_notification_references(filename)
+    refs = get_notification_references('foo.txt')
 
     assert refs == ['ABC0000000000000', 'DEF0000000000000', 'GHI0000000000000']
