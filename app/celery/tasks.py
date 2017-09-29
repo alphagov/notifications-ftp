@@ -29,11 +29,10 @@ def send_jobs_to_dvla(job_ids):
         with LocalDir('job') as job_folder:
             job_filenames = [get_job_from_s3(job_id) for job_id in job_ids]
             dvla_file = concat_files(job_filenames)
-            current_app.logger.info('Sending {} to dvla as {}'.format(job_filenames, dvla_file))
+            current_app.logger.info('Sending {} to dvla'.format(job_filenames))
 
             ftp_client.send_file(
-                local_file=str(job_folder / dvla_file),
-                remote_filename=dvla_file
+                local_file=str(job_folder / dvla_file)
             )
     except:
         current_app.logger.exception('FTP app failed to send jobs')
@@ -64,8 +63,7 @@ def send_api_notifications_to_dvla(filename):
 
         try:
             ftp_client.send_file(
-                local_file=str(api_folder / filename),
-                remote_filename=get_dvla_file_name()
+                local_file=str(api_folder / filename)
             )
         except FtpException:
             # if there's an s3 error we won't know what notifications to update, so only worry about FTP issues

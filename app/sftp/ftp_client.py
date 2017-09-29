@@ -4,7 +4,7 @@ import pysftp
 from flask import current_app
 from monotonic import monotonic
 
-from app.files.file_utils import get_new_dvla_filename
+from app.files.file_utils import get_dvla_file_name, get_new_dvla_filename
 
 
 class FtpException(Exception):
@@ -18,7 +18,7 @@ class FtpClient():
         self.password = app.config.get('FTP_PASSWORD')
         self.statsd_client = statsd_client
 
-    def send_file(self, local_file, remote_filename):
+    def send_file(self, local_file):
         filename_without_path = os.path.split(local_file)[1]
         try:
             cnopts = pysftp.CnOpts()
@@ -29,25 +29,26 @@ class FtpClient():
                 current_app.logger.info("uploading {}".format(local_file))
 
                 start_time = monotonic()
-                if sftp.exists('{}/{}'.format(sftp.pwd, filename_without_path)):
+
+                remote_filename = get_dvla_file_name()
+
+                if sftp.exists('{}/{}'.format(sftp.pwd, remote_filename)):
                     # increment the time in the filename by one minute - if there's ALSO a file with that name, then
                     # lets just give up as something's definitely gone weird.
-                    remote_filename = get_new_dvla_filename(filename_without_path)
+                    remote_filename = get_new_dvla_filename(remote_filename)
                     current_app.logger.warning('{} already exists on DVLA ftp, renaming to {}'.format(
                         filename_without_path,
                         remote_filename
                     ))
-                else:
-                    remote_filename = filename_without_path
 
                 sftp.put(local_file, remotepath='{}/{}'.format(sftp.pwd, remote_filename))
 
                 self.statsd_client.timing("ftp-client.upload-time", monotonic() - start_time)
 
-                if filename_without_path in sftp.listdir():
-                    current_app.logger.info("File {} successfully uploaded".format(filename_without_path))
+                if remote_filename in sftp.listdir():
+                    current_app.logger.info("Local file {} uploaded to DVLA as {}".format(local_file, remote_filename))
                 else:
-                    raise FtpException("File {} not uploaded".format(filename_without_path))
+                    raise FtpException("File {} not uploaded".format(local_file))
         except Exception as e:
             current_app.logger.exception(e)
             raise FtpException("Failed to sFTP file")

@@ -50,8 +50,7 @@ def test_should_call_send_ftp_with_dvla_file(mocks):
     send_jobs_to_dvla(["1", "2", "3"])
 
     mocks.send_file.assert_called_once_with(
-        local_file='/tmp/dvla-file-storage/job/DVLA-FILE',
-        remote_filename='DVLA-FILE'
+        local_file='/tmp/dvla-file-storage/job/DVLA-FILE'
     )
 
 
