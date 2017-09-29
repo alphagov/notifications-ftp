@@ -13,7 +13,6 @@ def test_should_send_correct_file(client, mocker):
     json_resp = json.loads(response.get_data(as_text=True))
     app.ftp_client.send_file.assert_called_with(
         local_filename="/tmp/test.txt",
-        remote_filename='Notify-201701011200-rq.txt'
     )
     assert response.status_code == 200
     assert json_resp['filename'] == "test.txt"

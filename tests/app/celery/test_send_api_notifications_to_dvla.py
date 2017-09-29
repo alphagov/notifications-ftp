@@ -40,7 +40,6 @@ def test_should_send_api_file(mocks):
 
     mocks.send_file.assert_called_once_with(
         local_file='/tmp/dvla-file-storage/api/2017-01-01T12:34:56Z-dvla-notifications.txt',
-        remote_filename='Notify-201701011730-rq.txt'
     )
 
 

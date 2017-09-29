@@ -14,7 +14,7 @@ sender_blueprint = Blueprint('send', __name__)
 @sender_blueprint.route('/send', methods=['POST'])
 def send_file():
     filename = request.args.get('filename')
-    ftp_client.send_file(local_filename="/tmp/" + filename, remote_filename=get_dvla_file_name())
+    ftp_client.send_file(local_filename="/tmp/" + filename)
     return jsonify(result="success", filename=filename), 200
 
 
