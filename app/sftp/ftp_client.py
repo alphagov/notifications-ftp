@@ -6,6 +6,8 @@ from monotonic import monotonic
 
 from app.files.file_utils import get_dvla_file_name, get_new_dvla_filename
 
+NOTIFY_SUBFOLDER = 'notify'
+
 
 class FtpException(Exception):
     pass
@@ -26,13 +28,14 @@ class FtpClient():
             with pysftp.Connection(self.host, username=self.username, password=self.password, cnopts=cnopts) as sftp:
                 upload_file(sftp, local_file, self.statsd_client)
         except Exception as e:
+            # reraise all exceptions as FtpException to ensure we can handle them down the line
             current_app.logger.exception(e)
             raise FtpException("Failed to sFTP file")
 
 
 def upload_file(sftp, local_file, statsd_client):
     filename_without_path = os.path.split(local_file)[1]
-    sftp.chdir('notify')
+    sftp.chdir(NOTIFY_SUBFOLDER)
     current_app.logger.info("uploading {}".format(local_file))
 
     start_time = monotonic()
@@ -52,6 +55,7 @@ def upload_file(sftp, local_file, statsd_client):
 
     statsd_client.timing("ftp-client.upload-time", monotonic() - start_time)
 
+    # would be good to check filesize here to be safe - see sftp.listdir_attr
     if remote_filename in sftp.listdir():
         current_app.logger.info("Local file {} uploaded to DVLA as {}".format(local_file, remote_filename))
     else:
