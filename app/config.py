@@ -22,7 +22,6 @@ class Config(object):
     ###########################
 
     NOTIFY_APP_NAME = 'api'
-    NOTIFY_ENVIRONMENT = 'development'
     AWS_REGION = 'eu-west-1'
     NOTIFY_LOG_PATH = '/var/log/notify/application.log'
 
@@ -57,7 +56,6 @@ class Config(object):
 
 
 class Development(Config):
-    NOTIFY_ENVIRONMENT = 'development'
     NOTIFICATION_QUEUE_PREFIX = 'development'
     DEBUG = True
     LOCAL_FILE_STORAGE_PATH = "/tmp/dvla-file-storage"
@@ -67,7 +65,6 @@ class Development(Config):
 
 
 class Test(Config):
-    NOTIFY_ENVIRONMENT = 'test'
     DEBUG = True
     STATSD_ENABLED = True
     STATSD_HOST = "localhost"
@@ -79,14 +76,12 @@ class Test(Config):
 
 
 class Preview(Config):
-    NOTIFY_ENVIRONMENT = 'preview'
 
     DVLA_JOB_BUCKET_NAME = 'preview-dvla-file-per-job'
     DVLA_API_BUCKET_NAME = 'preview-dvla-letter-api-files'
 
 
 class Staging(Config):
-    NOTIFY_ENVIRONMENT = 'staging'
     STATSD_ENABLED = True
 
     DVLA_JOB_BUCKET_NAME = 'staging-dvla-file-per-job'
@@ -94,7 +89,6 @@ class Staging(Config):
 
 
 class Production(Config):
-    NOTIFY_ENVIRONMENT = 'production'
     STATSD_ENABLED = True
 
     DVLA_JOB_BUCKET_NAME = 'production-dvla-file-per-job'
@@ -106,5 +100,5 @@ configs = {
     'test': Test,
     'preview': Preview,
     'staging': Staging,
-    'production': Production,
+    'live': Production,
 }
