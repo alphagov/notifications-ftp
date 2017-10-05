@@ -69,14 +69,23 @@ def test_get_api_from_s3_should_get_correct_file_to_download(local_api_dir, mock
     )
 
 
-def test_get_dvla_file_name():
+@pytest.mark.parametrize('file_ext,remote_filename', [
+    (None, 'Notify-201601011700-rq.txt'),
+    ('.txt', 'Notify-201601011700-rq.txt'),
+    ('.zip', 'Notify.201601011700.zip')
+])
+def test_get_dvla_file_name(file_ext, remote_filename):
     with freeze_time('2016-01-01T17:00:00'):
-        assert get_dvla_file_name() == 'Notify-201601011700-rq.txt'
+        assert get_dvla_file_name(file_ext=file_ext) == remote_filename
 
 
-def test_get_new_dvla_file_name():
+@pytest.mark.parametrize('old_filename,remote_filename', [
+    ('Notify-201601011759-rq.txt', 'Notify-201601011800-rq.txt'),
+    ('Notify.201601011759.zip', 'Notify.201601011800.zip')
+])
+def test_get_new_dvla_file_name(old_filename, remote_filename):
     # increment from 17:59 to 18:00
-    assert get_new_dvla_filename('Notify-201601011759-rq.txt') == 'Notify-201601011800-rq.txt'
+    assert get_new_dvla_filename(old_filename) == remote_filename
 
 
 def test_should_make_job_filename_from_job_id():
