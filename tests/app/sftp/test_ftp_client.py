@@ -7,9 +7,11 @@ from app.sftp.ftp_client import upload_file, FtpException
 
 
 @freeze_time('2016-01-01T17:00:00')
-def test_send_file_generates_remote_filename():
-    local_file = '/tmp/something/foo.txt'
-    remote_filename = 'Notify-201601011700-rq.txt'
+@pytest.mark.parametrize('local_file,remote_filename', [
+    ('/tmp/something/foo.txt', 'Notify-201601011700-rq.txt'),
+    ('/tmp/something/foo.zip', 'Notify.201601011700.zip')
+])
+def test_send_file_generates_remote_filename(local_file, remote_filename):
     sftp = Mock(
         pwd='~/notify',
         exists=Mock(return_value=False),
@@ -23,9 +25,11 @@ def test_send_file_generates_remote_filename():
 
 
 @freeze_time('2016-01-01T17:00:00')
-def test_send_file_increments_filename_if_exists():
-    local_file = '/tmp/something/foo.txt'
-    remote_filename = 'Notify-201601011701-rq.txt'
+@pytest.mark.parametrize('local_file,remote_filename', [
+    ('/tmp/something/foo.txt', 'Notify-201601011701-rq.txt'),
+    ('/tmp/something/foo.zip', 'Notify.201601011701.zip')
+])
+def test_send_file_increments_filename_if_exists(local_file, remote_filename):
     sftp = Mock(
         pwd='~/notify',
         exists=Mock(return_value=True),

@@ -40,7 +40,8 @@ def upload_file(sftp, local_file, statsd_client):
 
     start_time = monotonic()
 
-    remote_filename = get_dvla_file_name()
+    file_ext = os.path.splitext(local_file)[1]
+    remote_filename = get_dvla_file_name(file_ext=file_ext)
 
     if sftp.exists('{}/{}'.format(sftp.pwd, remote_filename)):
         # increment the time in the filename by one minute - if there's ALSO a file with that name, then

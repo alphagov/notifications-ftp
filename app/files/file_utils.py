@@ -11,18 +11,28 @@ import boto3
 
 
 DVLA_FILENAME_FORMAT = 'Notify-%Y%m%d%H%M-rq.txt'
+DVLA_ZIP_FILENAME_FORMAT = 'Notify.%Y%m%d%H%M.zip'
 
 
-def get_dvla_file_name(dt=None):
+def _get_dvla_format(file_ext='.txt'):
+    if file_ext and file_ext.lower() == '.zip':
+        dvla_format = DVLA_ZIP_FILENAME_FORMAT
+    else:
+        dvla_format = DVLA_FILENAME_FORMAT
+    return dvla_format
+
+
+def get_dvla_file_name(dt=None, file_ext='.txt'):
     dt = dt or datetime.utcnow()
-    return dt.strftime(DVLA_FILENAME_FORMAT)
+    return dt.strftime(_get_dvla_format(file_ext))
 
 
 def get_new_dvla_filename(old_filename):
+    file_ext = os.path.splitext(old_filename)[1]
     # increment the time by one minute
-    old_datetime = datetime.strptime(old_filename, DVLA_FILENAME_FORMAT)
+    old_datetime = datetime.strptime(old_filename, _get_dvla_format(file_ext))
 
-    return get_dvla_file_name(dt=old_datetime + timedelta(minutes=1))
+    return get_dvla_file_name(dt=old_datetime + timedelta(minutes=1), file_ext=file_ext)
 
 
 def job_file_name_for_job(job_id):
