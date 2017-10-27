@@ -91,7 +91,7 @@ def _remove_local_file_directory(subfolder):
 
 
 def get_notification_references(filename):
-    with (Path(current_app.config['LOCAL_FILE_STORAGE_PATH']) / 'api' / filename).open('r') as dvla_file:
+    with (Path(current_app.config['LOCAL_FILE_STORAGE_PATH']) / 'api' / filename).open('r', encoding='utf-8') as dvla_file:  # noqa
         return [line.split('|')[4] for line in dvla_file.readlines() if line]
 
 

@@ -133,9 +133,9 @@ def test_local_dir_removes_even_if_files_present(client):
 
 def test_get_notification_references_gets_references_from_file(local_api_dir):
     dvla_file_contents = '\n'.join([
-        '140|001|001||ABC0000000000000|||||||||||||1||2|3|4|5|6|WC2B 6NH|||||||||hello',
-        '140|001|001||DEF0000000000000|||||||||||||1||2|3|4|5|6|WC2B 6NH|||||||||hello',
-        '140|001|001||GHI0000000000000|||||||||||||1||2|3|4|5|6|WC2B 6NH|||||||||hello',
+        '140|001|001||ABC0000000000000|||||||||||||1||2|3|4|5|6|WC2B 6NH|||||||||hello🍕',
+        '140|001|001||DEF0000000000000|||||||||||||1||2|3|4|5|6|WC2B 6NH|||||||||hello🌯',
+        '140|001|001||GHI0000000000000|||||||||||||1||2|3|4|5|6|WC2B 6NH|||||||||hello🍔',
         ''
     ])
     path = (local_api_dir / 'foo.txt')
