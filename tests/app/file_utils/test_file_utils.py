@@ -1,8 +1,13 @@
 from pathlib import Path
+from io import BytesIO
 import os
-from unittest.mock import Mock
+from unittest.mock import call, Mock
+from zipfile import ZipFile
 
+import boto3
+from moto import mock_s3
 import pytest
+from flask import current_app
 from freezegun import freeze_time
 from app.files.file_utils import (
     get_dvla_file_name,
@@ -10,7 +15,9 @@ from app.files.file_utils import (
     job_file_name_for_job,
     get_job_from_s3,
     get_api_from_s3,
+    get_zip_of_letter_pdfs_from_s3,
     _get_file_from_s3,
+    _get_file_from_s3_in_memory,
     concat_files,
     get_notification_references,
     LocalDir
@@ -145,3 +152,47 @@ def test_get_notification_references_gets_references_from_file(local_api_dir):
     refs = get_notification_references('foo.txt')
 
     assert refs == ['ABC0000000000000', 'DEF0000000000000', 'GHI0000000000000']
+
+
+def test_get_zip_of_letter_pdfs_from_s3(notify_ftp, mocker):
+    mocked = mocker.patch('app.files.file_utils._get_file_from_s3_in_memory', return_value=b'\x00\x01')
+
+    zip_data = get_zip_of_letter_pdfs_from_s3(['2017-01-01/TEST1.PDF', '2017-01-01/TEST2.PDF'])
+
+    bucket_name = current_app.config['LETTERS_PDF_BUCKET_NAME']
+    calls = [
+        call(bucket_name, '2017-01-01/TEST1.PDF'),
+        call(bucket_name, '2017-01-01/TEST2.PDF')
+    ]
+    mocked.assert_has_calls(calls)
+
+    zipfile = ZipFile(BytesIO(zip_data))
+
+    assert zipfile.namelist()[0] == 'TEST1.PDF'
+    assert zipfile.namelist()[1] == 'TEST2.PDF'
+    assert zipfile.read('TEST1.PDF') == b'\x00\x01'
+    assert zipfile.read('TEST2.PDF') == b'\x00\x01'
+
+
+def test_get_zip_of_letter_pdfs_from_s3_empty_filenames(notify_ftp, mocker):
+    mocked = mocker.patch('app.files.file_utils._get_file_from_s3_in_memory', return_value=b'\x00\x01')
+
+    get_zip_of_letter_pdfs_from_s3([])
+
+    assert not mocked.called
+
+
+@mock_s3
+def test_get_file_from_s3_in_memory_should_return_file_contents_on_successful_s3_download():
+    bucket_name = 'bucket'
+    filename = 'foo.txt'
+
+    # use moto to mock out s3
+    conn = boto3.resource('s3', region_name='eu-west-1')
+    conn.create_bucket(Bucket=bucket_name)
+    s3 = boto3.client('s3', region_name='eu-west-1')
+    s3.put_object(Bucket=bucket_name, Key=filename, Body=b'\x00')
+
+    ret = _get_file_from_s3_in_memory(bucket_name, filename)
+
+    assert ret == b'\x00'

@@ -82,11 +82,11 @@ def send_api_notifications_to_dvla(filename):
 
 @notify_celery.task(name="zip-and-send-letter-pdfs")
 @statsd(namespace="tasks")
-def send_letter_pdf_notifications_to_dvla(filenames_to_zip):
+def zip_and_send_letter_pdfs(filenames_to_zip):
     zip_data = get_zip_of_letter_pdfs_from_s3(filenames_to_zip)
     folder_date = filenames_to_zip[0].split('/')[0]
 
-    dvla_file_name = LETTER_ZIP_FILE_LOCATION_STRUCTURE.format(
+    letter_zip_file_name = LETTER_ZIP_FILE_LOCATION_STRUCTURE.format(
         folder=folder_date,
         date=datetime.utcnow().strftime('%Y%m%d%H%M%S')
     )
@@ -97,14 +97,17 @@ def send_letter_pdf_notifications_to_dvla(filenames_to_zip):
         filedata=zip_data,
         region=current_app.config['AWS_REGION'],
         bucket_name=current_app.config['LETTERS_PDF_BUCKET_NAME'],
-        file_location=dvla_file_name
+        file_location=letter_zip_file_name
     )
-    current_app.logger.info("Uploading {file_count} letter PDFs in zip {filename}, size {size} to {bucket}".format(
-        file_count=len(filenames_to_zip),
-        filename=dvla_file_name,
-        size=sys.getsizeof(zip_data),
-        bucket=current_app.config['LETTERS_PDF_BUCKET_NAME'])
+    current_app.logger.info(
+        "Uploading {file_count} letter PDFs in zip {filename}, size {size} to {bucket}".format(
+            file_count=len(filenames_to_zip),
+            filename=letter_zip_file_name,
+            size=sys.getsizeof(zip_data),
+            bucket=current_app.config['LETTERS_PDF_BUCKET_NAME']
+        )
     )
+    # TODO: Send zip file to DVLA
 
 
 def update_notifications(task_name, references):
