@@ -1,7 +1,6 @@
 from flask import (
     Blueprint,
     jsonify,
-    current_app
 )
 
 status_blueprint = Blueprint('status', __name__)

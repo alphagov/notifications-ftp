@@ -5,7 +5,6 @@ from flask import (
 )
 
 from app import ftp_client
-from app.files.file_utils import get_dvla_file_name
 from app.celery.tasks import send_files_to_dvla
 
 sender_blueprint = Blueprint('send', __name__)

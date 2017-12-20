@@ -111,14 +111,14 @@ def test_concat_files_only_concats_provided_files(local_job_dir):
 
 def test_local_dir_creates_directory_if_not_present_and_then_removes_at_end(client):
     assert not os.path.exists(FOO_SUBFOLDER)
-    with LocalDir('foo') as foo:
+    with LocalDir('foo'):
         assert os.path.exists(FOO_SUBFOLDER)
     assert not os.path.exists(FOO_SUBFOLDER)
 
 
 def test_local_dir_keeps_directory_if_present_but_still_removes_at_end(client):
     os.makedirs(FOO_SUBFOLDER)
-    with LocalDir('foo') as foo:
+    with LocalDir('foo'):
         assert os.path.exists(FOO_SUBFOLDER)
     assert not os.path.exists(FOO_SUBFOLDER)
 
