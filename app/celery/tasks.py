@@ -1,9 +1,14 @@
+from datetime import datetime
+import sys
 from flask import current_app
+
+from notifications_utils.s3 import s3upload as utils_s3upload
 
 from app import notify_celery, ftp_client
 from app.files.file_utils import (
     get_job_from_s3,
     get_api_from_s3,
+    get_zip_of_letter_pdfs_from_s3,
     concat_files,
     LocalDir,
     get_notification_references
@@ -13,6 +18,7 @@ from app.sftp.ftp_client import FtpException
 
 
 NOTIFY_QUEUE = 'notify-internal-tasks'
+LETTER_ZIP_FILE_LOCATION_STRUCTURE = '{folder}/NOTIFY.{date}.ZIP'
 
 
 @notify_celery.task(name="send-files-to-dvla")
@@ -72,6 +78,33 @@ def send_api_notifications_to_dvla(filename):
             task_name = "update-letter-notifications-to-sent"
 
         update_notifications(task_name, notification_references)
+
+
+@notify_celery.task(name="zip-and-send-letter-pdfs")
+@statsd(namespace="tasks")
+def send_letter_pdf_notifications_to_dvla(filenames_to_zip):
+    zip_data = get_zip_of_letter_pdfs_from_s3(filenames_to_zip)
+    folder_date = filenames_to_zip[0].split('/')[0]
+
+    dvla_file_name = LETTER_ZIP_FILE_LOCATION_STRUCTURE.format(
+        folder=folder_date,
+        date=datetime.utcnow().strftime('%Y%m%d%H%M%S')
+    )
+
+    # temporary upload of zip file to s3 before sending it to DVLA
+    # should be deprecated once the dvla text file is retired
+    utils_s3upload(
+        filedata=zip_data,
+        region=current_app.config['AWS_REGION'],
+        bucket_name=current_app.config['LETTERS_PDF_BUCKET_NAME'],
+        file_location=dvla_file_name
+    )
+    current_app.logger.info("Uploading {file_count} letter PDFs in zip {filename}, size {size} to {bucket}".format(
+        file_count=len(filenames_to_zip),
+        filename=dvla_file_name,
+        size=sys.getsizeof(zip_data),
+        bucket=current_app.config['LETTERS_PDF_BUCKET_NAME'])
+    )
 
 
 def update_notifications(task_name, references):
