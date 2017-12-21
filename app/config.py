@@ -104,7 +104,7 @@ class Production(Config):
     DVLA_JOB_BUCKET_NAME = 'production-dvla-file-per-job'
     DVLA_API_BUCKET_NAME = 'production-dvla-letter-api-files'
 
-    LETTERS_PDF_BUCKET_NAME = 'live-letters-pdf'
+    LETTERS_PDF_BUCKET_NAME = 'production-letters-pdf'
 
 
 configs = {
