@@ -2,7 +2,7 @@ cffi==1.11.2
 pyftpdlib==1.5.3
 pysftp==0.2.9
 wheel==0.30.0
-statsd==3.2.1
+statsd==3.2.2
 credstash==1.8.0
 Flask==0.10.1
 Flask-Script==2.0.5
