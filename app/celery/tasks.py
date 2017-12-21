@@ -1,5 +1,4 @@
 from datetime import datetime
-import sys
 from flask import current_app
 
 from notifications_utils.s3 import s3upload as utils_s3upload
@@ -103,7 +102,7 @@ def zip_and_send_letter_pdfs(filenames_to_zip):
         "Uploading {file_count} letter PDFs in zip {filename}, size {size} to {bucket}".format(
             file_count=len(filenames_to_zip),
             filename=letter_zip_file_name,
-            size=sys.getsizeof(zip_data),
+            size=len(zip_data),
             bucket=current_app.config['LETTERS_PDF_BUCKET_NAME']
         )
     )
