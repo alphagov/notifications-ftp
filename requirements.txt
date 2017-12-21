@@ -1,5 +1,5 @@
 cffi==1.11.2
-pyftpdlib==1.5.0
+pyftpdlib==1.5.3
 pysftp==0.2.9
 wheel==0.29.0
 statsd==3.2.1
