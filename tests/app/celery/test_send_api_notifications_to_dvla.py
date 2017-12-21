@@ -72,7 +72,7 @@ def test_should_update_notifications_if_ftp_error(mocks):
 
 
 def test_should_update_notifications_to_success_in_1k_batches(mocker, mocks):
-    get_notification_references = mocker.patch(
+    mocker.patch(
         'app.celery.tasks.get_notification_references',
         return_value=list(range(10000))
     )

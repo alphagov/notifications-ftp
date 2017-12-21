@@ -2,7 +2,6 @@ from flask import current_app
 
 from app import notify_celery, ftp_client
 from app.files.file_utils import (
-    get_dvla_file_name,
     get_job_from_s3,
     get_api_from_s3,
     concat_files,
@@ -34,7 +33,7 @@ def send_jobs_to_dvla(job_ids):
             ftp_client.send_file(
                 local_file=str(job_folder / dvla_file)
             )
-    except:
+    except Exception:
         current_app.logger.exception('FTP app failed to send jobs')
         task_name = 'update-letter-job-to-error'
     else:

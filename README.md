@@ -48,5 +48,5 @@ Simply run
 make build test
 ```
 
-That will run pycodestyle for code analysis and our unit test suite.
+That will run flake8 for code analysis and our unit test suite.
 =======
