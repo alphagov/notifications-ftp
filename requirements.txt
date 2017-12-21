@@ -7,7 +7,7 @@ credstash==1.14.0
 Flask==0.12.2
 Flask-Script==2.0.6
 celery==4.1.0
-monotonic==1.2
+monotonic==1.4
 boto3==1.4.4
 
 git+https://github.com/alphagov/notifications-utils.git@21.0.0#egg=notifications-utils==21.0.0
