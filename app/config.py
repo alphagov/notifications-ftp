@@ -50,6 +50,8 @@ class Config(object):
     DVLA_JOB_BUCKET_NAME = None
     DVLA_API_BUCKET_NAME = None
 
+    LETTERS_PDF_BUCKET_NAME = None
+
 ######################
 # Config overrides ###
 ######################
@@ -63,6 +65,8 @@ class Development(Config):
     DVLA_JOB_BUCKET_NAME = 'development-dvla-file-per-job'
     DVLA_API_BUCKET_NAME = 'development-dvla-letter-api-files'
 
+    LETTERS_PDF_BUCKET_NAME = 'development-letters-pdf'
+
 
 class Test(Config):
     DEBUG = True
@@ -74,11 +78,15 @@ class Test(Config):
     DVLA_JOB_BUCKET_NAME = 'test-dvla-file-per-job'
     DVLA_API_BUCKET_NAME = 'test-dvla-letter-api-files'
 
+    LETTERS_PDF_BUCKET_NAME = 'test-letters-pdf'
+
 
 class Preview(Config):
 
     DVLA_JOB_BUCKET_NAME = 'preview-dvla-file-per-job'
     DVLA_API_BUCKET_NAME = 'preview-dvla-letter-api-files'
+
+    LETTERS_PDF_BUCKET_NAME = 'preview-letters-pdf'
 
 
 class Staging(Config):
@@ -87,12 +95,16 @@ class Staging(Config):
     DVLA_JOB_BUCKET_NAME = 'staging-dvla-file-per-job'
     DVLA_API_BUCKET_NAME = 'staging-dvla-letter-api-files'
 
+    LETTERS_PDF_BUCKET_NAME = 'staging-letters-pdf'
+
 
 class Production(Config):
     STATSD_ENABLED = True
 
     DVLA_JOB_BUCKET_NAME = 'production-dvla-file-per-job'
     DVLA_API_BUCKET_NAME = 'production-dvla-letter-api-files'
+
+    LETTERS_PDF_BUCKET_NAME = 'production-letters-pdf'
 
 
 configs = {
