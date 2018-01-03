@@ -99,26 +99,21 @@ def zip_and_send_letter_pdfs(filenames_to_zip):
 
     # temporary upload of zip file to s3 before sending it to DVLA
     # should be deprecated once the dvla text file is retired
-    current_app.logger.info(
-        "Uploading {file_count} letter PDFs in zip {filename}, size {size} to {bucket}".format(
-            file_count=len(filenames_to_zip),
-            filename=letter_zip_file_name,
-            size=len(zip_data),
-            bucket=current_app.config['LETTERS_PDF_BUCKET_NAME']
-        )
-    )
+    start_time = datetime.now()
     utils_s3upload(
         filedata=zip_data,
         region=current_app.config['AWS_REGION'],
         bucket_name=current_app.config['LETTERS_PDF_BUCKET_NAME'],
         file_location=letter_zip_file_name
     )
+    elapsed_time = datetime.now() - start_time
     current_app.logger.info(
-        "Uploaded {file_count} letter PDFs in zip {filename}, size {size} to {bucket}".format(
+        "Uploaded {file_count} letter PDFs in zip {filename}, size {size} to {bucket} in {elapsed_time}".format(
             file_count=len(filenames_to_zip),
             filename=letter_zip_file_name,
             size=len(zip_data),
-            bucket=current_app.config['LETTERS_PDF_BUCKET_NAME']
+            bucket=current_app.config['LETTERS_PDF_BUCKET_NAME'],
+            elapsed_time=elapsed_time.total_seconds()
         )
     )
     # TODO: Send zip file to DVLA
