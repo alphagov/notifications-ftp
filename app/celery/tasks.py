@@ -82,7 +82,6 @@ def send_api_notifications_to_dvla(filename):
 @notify_celery.task(name="zip-and-send-letter-pdfs")
 @statsd(namespace="tasks")
 def zip_and_send_letter_pdfs(filenames_to_zip):
-    zip_data = get_zip_of_letter_pdfs_from_s3(filenames_to_zip)
     folder_date = filenames_to_zip[0].split('/')[0]
 
     letter_zip_file_name = LETTER_ZIP_FILE_LOCATION_STRUCTURE.format(
@@ -90,8 +89,24 @@ def zip_and_send_letter_pdfs(filenames_to_zip):
         date=datetime.utcnow().strftime('%Y%m%d%H%M%S')
     )
 
+    current_app.logger.info(
+        "Starting to zip {file_count} letter PDFs in memory from {folder}".format(
+            file_count=len(filenames_to_zip),
+            folder=folder_date
+        )
+    )
+    zip_data = get_zip_of_letter_pdfs_from_s3(filenames_to_zip)
+
     # temporary upload of zip file to s3 before sending it to DVLA
     # should be deprecated once the dvla text file is retired
+    current_app.logger.info(
+        "Uploading {file_count} letter PDFs in zip {filename}, size {size} to {bucket}".format(
+            file_count=len(filenames_to_zip),
+            filename=letter_zip_file_name,
+            size=len(zip_data),
+            bucket=current_app.config['LETTERS_PDF_BUCKET_NAME']
+        )
+    )
     utils_s3upload(
         filedata=zip_data,
         region=current_app.config['AWS_REGION'],
@@ -99,7 +114,7 @@ def zip_and_send_letter_pdfs(filenames_to_zip):
         file_location=letter_zip_file_name
     )
     current_app.logger.info(
-        "Uploading {file_count} letter PDFs in zip {filename}, size {size} to {bucket}".format(
+        "Uploaded {file_count} letter PDFs in zip {filename}, size {size} to {bucket}".format(
             file_count=len(filenames_to_zip),
             filename=letter_zip_file_name,
             size=len(zip_data),
