@@ -20,12 +20,6 @@ NOTIFY_QUEUE = 'notify-internal-tasks'
 LETTER_ZIP_FILE_LOCATION_STRUCTURE = '{folder}/NOTIFY.{date}.ZIP'
 
 
-@notify_celery.task(name="send-files-to-dvla")
-@statsd(namespace="tasks")
-def send_files_to_dvla(jobs_ids):
-    send_jobs_to_dvla(jobs_ids)
-
-
 @notify_celery.task(name="send-jobs-to-dvla")
 @statsd(namespace="tasks")
 def send_jobs_to_dvla(job_ids):
