@@ -58,10 +58,6 @@ _generate-version-file: ## Generates the app version file
 test: ## run unit tests
 	./scripts/run_tests.sh
 
-.PHONY: coverage
-coverage: test ## run unit tests and report coverage
-	coveralls
-
 .PHONY: prepare-docker-build-image
 prepare-docker-build-image: ## Prepare the Docker builder image
 	docker build -f docker/Dockerfile \
@@ -74,16 +70,8 @@ prepare-docker-build-image: ## Prepare the Docker builder image
 		.
 
 define run_docker_container
-	# CIRCLECI=1 is an ugly hack because the coveralls-python library sends the PR link only this way
 	docker run -i${DOCKER_TTY} --rm \
 		--name "${DOCKER_CONTAINER_PREFIX}-${1}" \
-		-e CI_BRANCH=${GIT_BRANCH} \
-		-e CI_BUILD_NUMBER=${BUILD_NUMBER} \
-		-e CI_BUILD_URL=${BUILD_URL} \
-		-e CI_NAME=${CI_NAME} \
-		-e CI_PULL_REQUEST=${CI_PULL_REQUEST} \
-		-e CIRCLECI=1 \
-		-e COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN} \
 		-e http_proxy="${HTTP_PROXY}" \
 		-e HTTP_PROXY="${HTTP_PROXY}" \
 		-e https_proxy="${HTTPS_PROXY}" \
@@ -95,10 +83,6 @@ endef
 .PHONY: test-with-docker
 test-with-docker: prepare-docker-build-image ## Run tests inside a Docker container
 	$(call run_docker_container,test, make test)
-
-.PHONY: coverage-with-docker
-coverage-with-docker: prepare-docker-build-image ## Generates coverage report inside a Docker container
-	$(call run_docker_container,test, make coverage)
 
 .PHONY: clean-docker-containers
 clean-docker-containers: ## Clean up any remaining docker containers
