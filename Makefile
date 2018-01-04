@@ -69,6 +69,9 @@ prepare-docker-build-image: ## Prepare the Docker builder image
 		-t ${DOCKER_IMAGE_NAME} \
 		.
 
+.PHONY: build-with-docker
+build-with-docker: ;
+
 define run_docker_container
 	docker run -i${DOCKER_TTY} --rm \
 		--name "${DOCKER_CONTAINER_PREFIX}-${1}" \
@@ -83,6 +86,9 @@ endef
 .PHONY: test-with-docker
 test-with-docker: prepare-docker-build-image ## Run tests inside a Docker container
 	$(call run_docker_container,test, make test)
+
+.PHONY: coverage-with-docker
+coverage-with-docker: ;
 
 .PHONY: clean-docker-containers
 clean-docker-containers: ## Clean up any remaining docker containers
