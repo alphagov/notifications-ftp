@@ -20,17 +20,42 @@ class FtpClient():
         self.password = app.config.get('FTP_PASSWORD')
         self.statsd_client = statsd_client
 
-    def send_file(self, local_file):
+    def _send(self, func, *args):
         try:
             cnopts = pysftp.CnOpts()
             cnopts.hostkeys = None
             current_app.logger.info("opening connection to {}".format(self.host))
             with pysftp.Connection(self.host, username=self.username, password=self.password, cnopts=cnopts) as sftp:
-                upload_file(sftp, local_file, self.statsd_client)
+                func(sftp, *args)
         except Exception as e:
             # reraise all exceptions as FtpException to ensure we can handle them down the line
             current_app.logger.exception(e)
             raise FtpException("Failed to sFTP file")
+
+    def send_file(self, local_file):
+        self._send(upload_file, local_file, self.statsd_client)
+
+    def send_data(self, data, filename):
+        self._send(upload_data, data, filename, self.statsd_client)
+
+
+def upload_data(sftp, data, filename, statsd_client):
+    sftp.chdir(NOTIFY_SUBFOLDER)
+
+    current_app.logger.info("uploading zip {} of total size {:,}".format(filename, len(data)))
+
+    start_time = monotonic()
+
+    with sftp.open('{}/{}'.format(sftp.pwd, filename), mode='w') as remote_file:
+        remote_file.write(data)
+
+    statsd_client.timing("ftp-client.zip-upload-time", monotonic() - start_time)
+
+    # would be good to check filesize here to be safe - see sftp.listdir_attr
+    if filename in sftp.listdir():
+        current_app.logger.info("Data {} uploaded to DVLA".format(filename))
+    else:
+        raise FtpException("Zip file {} not uploaded".format(filename))
 
 
 def upload_file(sftp, local_file, statsd_client):

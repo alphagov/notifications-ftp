@@ -78,10 +78,11 @@ def send_api_notifications_to_dvla(filename):
 def zip_and_send_letter_pdfs(filenames_to_zip):
     folder_date = filenames_to_zip[0].split('/')[0]
 
-    letter_zip_file_name = LETTER_ZIP_FILE_LOCATION_STRUCTURE.format(
+    s3_letter_zip_file_name = LETTER_ZIP_FILE_LOCATION_STRUCTURE.format(
         folder=folder_date,
         date=datetime.utcnow().strftime('%Y%m%d%H%M%S')
     )
+    zip_file_name = s3_letter_zip_file_name.split('/')[1]
 
     current_app.logger.info(
         "Starting to zip {file_count} letter PDFs in memory from {folder}".format(
@@ -98,19 +99,20 @@ def zip_and_send_letter_pdfs(filenames_to_zip):
         filedata=zip_data,
         region=current_app.config['AWS_REGION'],
         bucket_name=current_app.config['LETTERS_PDF_BUCKET_NAME'],
-        file_location=letter_zip_file_name
+        file_location=s3_letter_zip_file_name
     )
     elapsed_time = datetime.now() - start_time
     current_app.logger.info(
         "Uploaded {file_count} letter PDFs in zip {filename}, size {size} to {bucket} in {elapsed_time}".format(
             file_count=len(filenames_to_zip),
-            filename=letter_zip_file_name,
+            filename=s3_letter_zip_file_name,
             size=len(zip_data),
             bucket=current_app.config['LETTERS_PDF_BUCKET_NAME'],
             elapsed_time=elapsed_time.total_seconds()
         )
     )
     # TODO: Send zip file to DVLA
+    ftp_client.send_data(zip_data, zip_file_name)
 
 
 def update_notifications(task_name, references):

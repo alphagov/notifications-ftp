@@ -13,7 +13,7 @@ def mocks(mocker, client):
             return_value=b'\x00\x01'
         )
         upload_to_s3 = mocker.patch('app.celery.tasks.utils_s3upload')
-        send_file = mocker.patch('app.celery.tasks.ftp_client.send_file')
+        send_data = mocker.patch('app.celery.tasks.ftp_client.send_data')
     with freeze_time('2017-01-01 17:30'):
         yield ZipAndSendLetterPDFsMocks
 
