@@ -22,7 +22,7 @@ class Config(object):
     ###########################
 
     NOTIFY_APP_NAME = 'api'
-    AWS_REGION = 'eu-west-1'
+    AWS_REGION = os.getenv('AWS_REGION', 'eu-west-1')
     NOTIFY_LOG_PATH = '/var/log/notify/application.log'
 
     BROKER_URL = 'sqs://'
