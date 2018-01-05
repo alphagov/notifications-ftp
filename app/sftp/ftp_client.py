@@ -35,19 +35,29 @@ class FtpClient():
     def send_file(self, local_file):
         self._send(upload_file, local_file, self.statsd_client)
 
-    def send_data(self, data, filename):
-        self._send(upload_data, data, filename, self.statsd_client)
+    def send_zip(self, zip_data, filename):
+        self._send(upload_zip, zip_data, filename, self.statsd_client)
 
 
-def upload_data(sftp, data, filename, statsd_client):
+def upload_zip(sftp, zip_data, filename, statsd_client):
     sftp.chdir(NOTIFY_SUBFOLDER)
 
-    current_app.logger.info("uploading zip {} of total size {:,}".format(filename, len(data)))
+    current_app.logger.info("uploading zip {} of total size {:,}".format(filename, len(zip_data)))
 
     start_time = monotonic()
 
-    with sftp.open('{}/{}'.format(sftp.pwd, filename), mode='w') as remote_file:
-        remote_file.write(data)
+    if sftp.exists('{}/{}'.format(sftp.pwd, filename)):
+        # increment the time in the filename by one minute - if there's ALSO a file with that name, then
+        # lets just give up as something's definitely gone weird.
+        old_filename = filename
+        filename = get_new_dvla_filename(filename)
+        current_app.logger.warning('{} already exists on DVLA ftp, renaming to {}'.format(
+            old_filename,
+            filename
+        ))
+
+    with sftp.open('{}/{}'.format(sftp.pwd, filename), mode='xw') as remote_file:
+        remote_file.write(zip_data)
 
     statsd_client.timing("ftp-client.zip-upload-time", monotonic() - start_time)
 
