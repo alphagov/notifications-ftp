@@ -33,12 +33,3 @@ WORKDIR /var/project
 # Copy from the real world, one dir up (project root) into the environment's current working directory
 # Docker will rebuild from here down every time.
 COPY . .
-
-ARG CI_NAME
-ARG CI_BUILD_NUMBER
-ARG CI_BUILD_URL
-ENV CI_NAME=$CI_NAME
-ENV CI_BUILD_NUMBER=$CI_BUILD_NUMBER
-ENV CI_BUILD_URL=$CI_BUILD_URL
-
-RUN make _generate-version-file

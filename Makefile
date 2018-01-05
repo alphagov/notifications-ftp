@@ -59,13 +59,10 @@ test: ## run unit tests
 	./scripts/run_tests.sh
 
 .PHONY: prepare-docker-build-image
-prepare-docker-build-image: ## Prepare the Docker builder image
+prepare-docker-build-image: _generate-version-file ## Prepare the Docker builder image
 	docker build -f docker/Dockerfile \
 		--build-arg http_proxy="${http_proxy}" \
 		--build-arg https_proxy="${https_proxy}" \
-		--build-arg CI_NAME=${CI_NAME} \
-		--build-arg CI_BUILD_NUMBER=${BUILD_NUMBER} \
-		--build-arg CI_BUILD_URL=${BUILD_URL} \
 		-t ${DOCKER_IMAGE_NAME} \
 		.
 
