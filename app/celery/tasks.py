@@ -11,6 +11,7 @@ from app.files.file_utils import (
     concat_files,
     LocalDir,
     get_notification_references,
+    get_notification_references_from_s3_filenames,
     get_dvla_file_name,
 )
 from app.statsd_decorators import statsd
@@ -105,7 +106,17 @@ def zip_and_send_letter_pdfs(filenames_to_zip):
             elapsed_time=elapsed_time.total_seconds()
         )
     )
-    ftp_client.send_zip(zip_data, zip_file_name)
+    try:
+        ftp_client.send_zip(zip_data, zip_file_name)
+    except FtpException:
+        # if there's an s3 error we won't know what notifications to update, so only worry about FTP issues
+        current_app.logger.exception('FTP app failed to send api messages')
+        task_name = "update-letter-notifications-to-error"
+    else:
+        task_name = "update-letter-notifications-to-sent"
+
+    refs = get_notification_references_from_s3_filenames(filenames_to_zip)
+    update_notifications(task_name, refs)
 
 
 def update_notifications(task_name, references):

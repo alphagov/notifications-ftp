@@ -20,6 +20,7 @@ from app.files.file_utils import (
     _get_file_from_s3_in_memory,
     concat_files,
     get_notification_references,
+    get_notification_references_from_s3_filenames,
     LocalDir
 )
 
@@ -152,6 +153,16 @@ def test_get_notification_references_gets_references_from_file(local_api_dir):
     refs = get_notification_references('foo.txt')
 
     assert refs == ['ABC0000000000000', 'DEF0000000000000', 'GHI0000000000000']
+
+
+def test_get_notification_references_from_s3():
+    filenames = [
+        '2017-12-06/NOTIFY.ABC0000000000000.D.2.C.C.20171206184702.PDF',
+        '2017-12-06/NOTIFY.DEF0000000000000.D.2.C.C.20171206184710.PDF'
+    ]
+    refs = get_notification_references_from_s3_filenames(filenames)
+
+    assert set(refs) == set(['ABC0000000000000', 'DEF0000000000000'])
 
 
 def test_get_zip_of_letter_pdfs_from_s3(notify_ftp, mocker):

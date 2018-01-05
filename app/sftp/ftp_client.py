@@ -41,8 +41,9 @@ class FtpClient():
 
 def upload_zip(sftp, zip_data, filename, statsd_client):
     sftp.chdir(NOTIFY_SUBFOLDER)
+    zip_data_len = len(zip_data)
 
-    current_app.logger.info("uploading zip {} of total size {:,}".format(filename, len(zip_data)))
+    current_app.logger.info("uploading zip {} of total size {:,}".format(filename, zip_data_len))
 
     start_time = monotonic()
 
@@ -61,9 +62,14 @@ def upload_zip(sftp, zip_data, filename, statsd_client):
 
     statsd_client.timing("ftp-client.zip-upload-time", monotonic() - start_time)
 
-    # would be good to check filesize here to be safe - see sftp.listdir_attr
     if filename in sftp.listdir():
-        current_app.logger.info("Data {} uploaded to DVLA".format(filename))
+        stats = sftp.lstat('{}/{}'.format(sftp.pwd, filename))
+        if stats.st_size != zip_data_len:
+            raise FtpException(
+                "Zip file {} uploaded but size is incorrect: is {}, expected {}".format(
+                    filename, stats.st_size, zip_data_len))
+        else:
+            current_app.logger.info("Data {} uploaded to DVLA".format(filename))
     else:
         raise FtpException("Zip file {} not uploaded".format(filename))
 

@@ -122,6 +122,11 @@ def get_notification_references(filename):
         return [line.split('|')[4] for line in dvla_file.readlines() if line]
 
 
+def get_notification_references_from_s3_filenames(filenames):
+    # assumes S3 filename is like: 2017-12-06/NOTIFY.ABCDEFG1234567890.D.2.C.C.20171206184702.PDF
+    return [f.split('.')[1] for f in filenames]
+
+
 class LocalDir:
     def __init__(self, subfolder):
         self.subfolder = subfolder

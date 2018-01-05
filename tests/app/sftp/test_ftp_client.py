@@ -6,14 +6,15 @@ from freezegun import freeze_time
 from app.sftp.ftp_client import upload_file, upload_zip, FtpException
 
 
-mock_remote_file = Mock(
-    write=Mock(),
-    __exit__=Mock(),
-    __enter__=Mock()
-)
-
-mock_data = b'\x00'
-mock_remote_filename = 'NOTIFY.20160101170000.ZIP'
+@pytest.fixture
+def mocks():
+    class SendZipMocks:
+        mock_bad_lstat = Mock(st_size=10)
+        mock_lstat = Mock(st_size=1)
+        mock_remote_file = Mock(write=Mock(), __exit__=Mock(), __enter__=Mock())
+        mock_data = b'\x00'
+        mock_remote_filename = 'NOTIFY.20160101170000.ZIP'
+    yield SendZipMocks
 
 
 @freeze_time('2016-01-01T17:00:00')
@@ -63,44 +64,60 @@ def test_send_file_errors_if_file_wasnt_put_on():
 
 
 @freeze_time('2016-01-01T17:00:00')
-def test_send_zip_generates_remote_filename():
+def test_send_zip_generates_remote_filename(mocks):
     mock_zip_sftp = Mock(
         pwd='~/notify',
         exists=Mock(return_value=False),
-        listdir=Mock(return_value=[mock_remote_filename]),
-        open=Mock(return_value=mock_remote_file)
+        listdir=Mock(return_value=[mocks.mock_remote_filename]),
+        open=Mock(return_value=mocks.mock_remote_file),
+        lstat=Mock(return_value=mocks.mock_lstat),
     )
 
-    upload_zip(mock_zip_sftp, mock_data, mock_remote_filename, Mock())
+    upload_zip(mock_zip_sftp, mocks.mock_data, mocks.mock_remote_filename, Mock())
 
     mock_zip_sftp.chdir.assert_called_once_with('notify')
-    mock_zip_sftp.open.assert_called_once_with('~/notify/' + mock_remote_filename, mode='xw')
+    mock_zip_sftp.open.assert_called_once_with('~/notify/' + mocks.mock_remote_filename, mode='xw')
 
 
 @freeze_time('2016-01-01T17:00:00')
-def test_send_zip_increments_filename_if_exists():
+def test_send_zip_increments_filename_if_exists(mocks):
     mock_new_remote_filename = 'NOTIFY.20160101170100.ZIP'
 
     mock_zip_sftp = Mock(
         pwd='~/notify',
         exists=Mock(return_value=True),
         listdir=Mock(return_value=[mock_new_remote_filename]),
-        open=Mock(return_value=mock_remote_file)
+        open=Mock(return_value=mocks.mock_remote_file),
+        lstat=Mock(return_value=mocks.mock_lstat),
     )
 
-    upload_zip(mock_zip_sftp, mock_data, mock_remote_filename, Mock())
+    upload_zip(mock_zip_sftp, mocks.mock_data, mocks.mock_remote_filename, Mock())
 
     mock_zip_sftp.open.assert_called_once_with('~/notify/' + mock_new_remote_filename, mode='xw')
 
 
 @freeze_time('2016-01-01T17:00:00')
-def test_send_zip_errors_if_file_wasnt_put_on():
+def test_send_zip_errors_if_file_wasnt_put_on(mocks):
     mock_zip_sftp = Mock(
         pwd='~/notify',
         exists=Mock(return_value=False),
         listdir=Mock(return_value=[]),
-        open=Mock(return_value=mock_remote_file)
+        open=Mock(return_value=mocks.mock_remote_file),
     )
 
     with pytest.raises(FtpException):
-        upload_zip(mock_zip_sftp, mock_data, mock_remote_filename, Mock())
+        upload_zip(mock_zip_sftp, mocks.mock_data, mocks.mock_remote_filename, Mock())
+
+
+@freeze_time('2016-01-01T17:00:00')
+def test_send_zip_errors_if_remote_file_size_is_different(mocks):
+    mock_zip_sftp = Mock(
+        pwd='~/notify',
+        exists=Mock(return_value=False),
+        listdir=Mock(return_value=[mocks.mock_remote_filename]),
+        open=Mock(return_value=mocks.mock_remote_file),
+        lstat=Mock(return_value=mocks.mock_bad_lstat),
+    )
+
+    with pytest.raises(FtpException):
+        upload_zip(mock_zip_sftp, mocks.mock_data, mocks.mock_remote_filename, Mock())
