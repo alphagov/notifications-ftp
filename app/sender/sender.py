@@ -5,8 +5,7 @@ from flask import (
 )
 
 from app import ftp_client
-from app.files.file_utils import get_dvla_file_name
-from app.celery.tasks import send_files_to_dvla
+from app.celery.tasks import send_jobs_to_dvla
 
 sender_blueprint = Blueprint('send', __name__)
 
@@ -21,5 +20,5 @@ def send_file():
 @sender_blueprint.route('/test-s3', methods=['GET'])
 def test_s3():
     request.args.getlist('job_id')
-    send_files_to_dvla.apply_async([request.args.getlist('job_id')], queue='process-ftp-tasks')
+    send_jobs_to_dvla.apply_async([request.args.getlist('job_id')], queue='process-ftp-tasks')
     return jsonify(result="success"), 200

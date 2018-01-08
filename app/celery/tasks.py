@@ -1,10 +1,13 @@
+from datetime import datetime
 from flask import current_app
+
+from notifications_utils.s3 import s3upload as utils_s3upload
 
 from app import notify_celery, ftp_client
 from app.files.file_utils import (
-    get_dvla_file_name,
     get_job_from_s3,
     get_api_from_s3,
+    get_zip_of_letter_pdfs_from_s3,
     concat_files,
     LocalDir,
     get_notification_references
@@ -14,12 +17,7 @@ from app.sftp.ftp_client import FtpException
 
 
 NOTIFY_QUEUE = 'notify-internal-tasks'
-
-
-@notify_celery.task(name="send-files-to-dvla")
-@statsd(namespace="tasks")
-def send_files_to_dvla(jobs_ids):
-    send_jobs_to_dvla(jobs_ids)
+LETTER_ZIP_FILE_LOCATION_STRUCTURE = '{folder}/NOTIFY.{date}.ZIP'
 
 
 @notify_celery.task(name="send-jobs-to-dvla")
@@ -34,7 +32,7 @@ def send_jobs_to_dvla(job_ids):
             ftp_client.send_file(
                 local_file=str(job_folder / dvla_file)
             )
-    except:
+    except Exception:
         current_app.logger.exception('FTP app failed to send jobs')
         task_name = 'update-letter-job-to-error'
     else:
@@ -73,6 +71,46 @@ def send_api_notifications_to_dvla(filename):
             task_name = "update-letter-notifications-to-sent"
 
         update_notifications(task_name, notification_references)
+
+
+@notify_celery.task(name="zip-and-send-letter-pdfs")
+@statsd(namespace="tasks")
+def zip_and_send_letter_pdfs(filenames_to_zip):
+    folder_date = filenames_to_zip[0].split('/')[0]
+
+    letter_zip_file_name = LETTER_ZIP_FILE_LOCATION_STRUCTURE.format(
+        folder=folder_date,
+        date=datetime.utcnow().strftime('%Y%m%d%H%M%S')
+    )
+
+    current_app.logger.info(
+        "Starting to zip {file_count} letter PDFs in memory from {folder}".format(
+            file_count=len(filenames_to_zip),
+            folder=folder_date
+        )
+    )
+    zip_data = get_zip_of_letter_pdfs_from_s3(filenames_to_zip)
+
+    # temporary upload of zip file to s3 before sending it to DVLA
+    # should be deprecated once the dvla text file is retired
+    start_time = datetime.now()
+    utils_s3upload(
+        filedata=zip_data,
+        region=current_app.config['AWS_REGION'],
+        bucket_name=current_app.config['LETTERS_PDF_BUCKET_NAME'],
+        file_location=letter_zip_file_name
+    )
+    elapsed_time = datetime.now() - start_time
+    current_app.logger.info(
+        "Uploaded {file_count} letter PDFs in zip {filename}, size {size} to {bucket} in {elapsed_time}".format(
+            file_count=len(filenames_to_zip),
+            filename=letter_zip_file_name,
+            size=len(zip_data),
+            bucket=current_app.config['LETTERS_PDF_BUCKET_NAME'],
+            elapsed_time=elapsed_time.total_seconds()
+        )
+    )
+    # TODO: Send zip file to DVLA
 
 
 def update_notifications(task_name, references):

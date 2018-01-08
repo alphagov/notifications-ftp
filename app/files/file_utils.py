@@ -9,6 +9,7 @@ from shutil import (
 from flask import current_app
 import boto3
 
+from app.files.in_memory_zip import InMemoryZip
 
 DVLA_FILENAME_FORMAT = 'Notify-%Y%m%d%H%M-rq.txt'
 DVLA_ZIP_FILENAME_FORMAT = 'Notify.%Y%m%d%H%M.zip'
@@ -49,6 +50,30 @@ def get_job_from_s3(job_id):
 def get_api_from_s3(filename):
     bucket_name = current_app.config['DVLA_API_BUCKET_NAME']
     return _get_file_from_s3(bucket_name, 'api', filename)
+
+
+def get_zip_of_letter_pdfs_from_s3(filenames):
+    bucket_name = current_app.config['LETTERS_PDF_BUCKET_NAME']
+    imz = InMemoryZip()
+
+    for i, filename in enumerate(filenames):
+        if i % 100 == 0:
+            current_app.logger.info('Zipping {} of {} letter PDFs'.format(
+                i, len(filenames)))
+        pdf_filename = filename.split('/')[-1]
+        pdf_file = _get_file_from_s3_in_memory(bucket_name, filename)
+        imz.append(pdf_filename, pdf_file)
+
+    return imz.read()
+
+
+def _get_file_from_s3_in_memory(bucket_name, filename):
+    s3 = boto3.resource('s3')
+    obj = s3.Object(
+        bucket_name=bucket_name,
+        key=filename
+    )
+    return obj.get()["Body"].read()
 
 
 def _get_file_from_s3(bucket_name, subfolder, filename):

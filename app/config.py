@@ -22,7 +22,7 @@ class Config(object):
     ###########################
 
     NOTIFY_APP_NAME = 'api'
-    AWS_REGION = 'eu-west-1'
+    AWS_REGION = os.getenv('AWS_REGION', 'eu-west-1')
     NOTIFY_LOG_PATH = '/var/log/notify/application.log'
 
     BROKER_URL = 'sqs://'
@@ -40,6 +40,10 @@ class Config(object):
     CELERY_QUEUES = [
         Queue('process-ftp-tasks', Exchange('default'), routing_key='process-ftp-tasks')
     ]
+    # restart workers after each task is executed - this will help prevent any memory leaks (not that we should be
+    # encouraging sloppy memory management). Since we only run a handful of tasks per day, and none are time sensitive,
+    # the extra couple of seconds overhead isn't seen to be a huge issue.
+    CELERYD_MAX_TASKS_PER_CHILD = 1
 
     STATSD_ENABLED = False
     STATSD_HOST = "statsd.hostedgraphite.com"
@@ -49,6 +53,8 @@ class Config(object):
 
     DVLA_JOB_BUCKET_NAME = None
     DVLA_API_BUCKET_NAME = None
+
+    LETTERS_PDF_BUCKET_NAME = None
 
 ######################
 # Config overrides ###
@@ -63,6 +69,8 @@ class Development(Config):
     DVLA_JOB_BUCKET_NAME = 'development-dvla-file-per-job'
     DVLA_API_BUCKET_NAME = 'development-dvla-letter-api-files'
 
+    LETTERS_PDF_BUCKET_NAME = 'development-letters-pdf'
+
 
 class Test(Config):
     DEBUG = True
@@ -74,11 +82,15 @@ class Test(Config):
     DVLA_JOB_BUCKET_NAME = 'test-dvla-file-per-job'
     DVLA_API_BUCKET_NAME = 'test-dvla-letter-api-files'
 
+    LETTERS_PDF_BUCKET_NAME = 'test-letters-pdf'
+
 
 class Preview(Config):
 
     DVLA_JOB_BUCKET_NAME = 'preview-dvla-file-per-job'
     DVLA_API_BUCKET_NAME = 'preview-dvla-letter-api-files'
+
+    LETTERS_PDF_BUCKET_NAME = 'preview-letters-pdf'
 
 
 class Staging(Config):
@@ -87,12 +99,16 @@ class Staging(Config):
     DVLA_JOB_BUCKET_NAME = 'staging-dvla-file-per-job'
     DVLA_API_BUCKET_NAME = 'staging-dvla-letter-api-files'
 
+    LETTERS_PDF_BUCKET_NAME = 'staging-letters-pdf'
+
 
 class Production(Config):
     STATSD_ENABLED = True
 
     DVLA_JOB_BUCKET_NAME = 'production-dvla-file-per-job'
     DVLA_API_BUCKET_NAME = 'production-dvla-letter-api-files'
+
+    LETTERS_PDF_BUCKET_NAME = 'production-letters-pdf'
 
 
 configs = {
