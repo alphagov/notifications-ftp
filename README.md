@@ -14,7 +14,7 @@ To run the FTP application, you will need appropriate AWS credentials. You shoul
 
 Your aws credentials should be stored in a folder located at `~/.aws`. Follow [Amazon's instructions](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-config-files) for storing them correctly.
 
-### Virtualenv
+### Virtualenv
 
 ```
 mkvirtualenv -p /usr/local/bin/python3 notifications-ftp
@@ -49,4 +49,3 @@ make build test
 ```
 
 That will run flake8 for code analysis and our unit test suite.
-=======
