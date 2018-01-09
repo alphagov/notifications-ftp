@@ -2,6 +2,7 @@ from datetime import datetime
 from flask import current_app
 from freezegun import freeze_time
 import pytest
+from botocore.exceptions import ClientError
 
 from app.celery.tasks import zip_and_send_letter_pdfs
 from app.files.file_utils import get_dvla_file_name
@@ -75,6 +76,19 @@ def test_zip_and_send_should_update_notifications_to_success(mocks):
 
     mocks.send_task.assert_called_once_with(
         name='update-letter-notifications-to-sent',
+        args=(['1', '2', '3'],),
+        queue='notify-internal-tasks'
+    )
+
+
+def test_zip_and_send_should_update_notifications_if_s3_client_error(mocks):
+    mocks.get_zip_of_letter_pdfs_from_s3.side_effect = ClientError({}, 'operation')
+
+    filenames = ['2017-01-01/TEST1.PDF']
+    zip_and_send_letter_pdfs(filenames)
+
+    mocks.send_task.assert_called_once_with(
+        name='update-letter-notifications-to-error',
         args=(['1', '2', '3'],),
         queue='notify-internal-tasks'
     )
