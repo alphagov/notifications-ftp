@@ -20,6 +20,7 @@ from app.files.file_utils import (
     _get_file_from_s3_in_memory,
     concat_files,
     get_notification_references,
+    get_notification_references_from_s3_filenames,
     LocalDir
 )
 
@@ -79,7 +80,7 @@ def test_get_api_from_s3_should_get_correct_file_to_download(local_api_dir, mock
 @pytest.mark.parametrize('file_ext,remote_filename', [
     (None, 'Notify-201601011700-rq.txt'),
     ('.txt', 'Notify-201601011700-rq.txt'),
-    ('.zip', 'Notify.201601011700.zip')
+    ('.zip', 'NOTIFY.20160101170000.ZIP')
 ])
 def test_get_dvla_file_name(file_ext, remote_filename):
     with freeze_time('2016-01-01T17:00:00'):
@@ -88,7 +89,7 @@ def test_get_dvla_file_name(file_ext, remote_filename):
 
 @pytest.mark.parametrize('old_filename,remote_filename', [
     ('Notify-201601011759-rq.txt', 'Notify-201601011800-rq.txt'),
-    ('Notify.201601011759.zip', 'Notify.201601011800.zip')
+    ('NOTIFY.20160101175900.ZIP', 'NOTIFY.20160101180000.ZIP')
 ])
 def test_get_new_dvla_file_name(old_filename, remote_filename):
     # increment from 17:59 to 18:00
@@ -154,6 +155,16 @@ def test_get_notification_references_gets_references_from_file(local_api_dir):
     assert refs == ['ABC0000000000000', 'DEF0000000000000', 'GHI0000000000000']
 
 
+def test_get_notification_references_from_s3():
+    filenames = [
+        '2017-12-06/NOTIFY.ABC0000000000000.D.2.C.C.20171206184702.PDF',
+        '2017-12-06/NOTIFY.DEF0000000000000.D.2.C.C.20171206184710.PDF'
+    ]
+    refs = get_notification_references_from_s3_filenames(filenames)
+
+    assert set(refs) == set(['ABC0000000000000', 'DEF0000000000000'])
+
+
 def test_get_zip_of_letter_pdfs_from_s3(notify_ftp, mocker):
     mocked = mocker.patch('app.files.file_utils._get_file_from_s3_in_memory', return_value=b'\x00\x01')
 
@@ -172,14 +183,6 @@ def test_get_zip_of_letter_pdfs_from_s3(notify_ftp, mocker):
     assert zipfile.namelist()[1] == 'TEST2.PDF'
     assert zipfile.read('TEST1.PDF') == b'\x00\x01'
     assert zipfile.read('TEST2.PDF') == b'\x00\x01'
-
-
-def test_get_zip_of_letter_pdfs_from_s3_empty_filenames(notify_ftp, mocker):
-    mocked = mocker.patch('app.files.file_utils._get_file_from_s3_in_memory', return_value=b'\x00\x01')
-
-    get_zip_of_letter_pdfs_from_s3([])
-
-    assert not mocked.called
 
 
 @mock_s3
