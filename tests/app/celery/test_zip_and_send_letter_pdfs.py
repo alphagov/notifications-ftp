@@ -1,4 +1,6 @@
 from datetime import datetime
+from unittest.mock import call
+
 from flask import current_app
 from freezegun import freeze_time
 import pytest
@@ -38,16 +40,25 @@ def test_should_get_zip_of_letter_pdfs_from_s3(mocks):
 
 def test_should_upload_zip_of_letter_pdfs_to_s3(notify_ftp, mocks):
     filenames = ['2017-01-01/TEST1.PDF']
-
-    zip_and_send_letter_pdfs(filenames)
     zip_filename = get_dvla_file_name(dt=datetime(2017, 1, 1, 17, 30), file_ext='.zip')
     location = '{}/{}'.format('2017-01-01', zip_filename)
-    mocks.upload_to_s3.assert_called_once_with(
-        bucket_name=current_app.config['LETTERS_PDF_BUCKET_NAME'],
-        file_location=location,
-        filedata=b'\x00\x01',
-        region='eu-west-1'
-    )
+
+    zip_and_send_letter_pdfs(filenames)
+
+    assert mocks.upload_to_s3.call_args_list == [
+        call(
+            bucket_name=current_app.config['LETTERS_PDF_BUCKET_NAME'],
+            file_location='{}/zips_sent/{}.TXT'.format('2017-01-01', zip_filename),
+            filedata=b'',
+            region='eu-west-1'
+        ),
+        call(
+            bucket_name=current_app.config['LETTERS_PDF_BUCKET_NAME'],
+            file_location=location,
+            filedata=b'\x00\x01',
+            region='eu-west-1'
+        )
+    ]
 
 
 def test_should_send_zip_file(mocks):

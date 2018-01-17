@@ -90,6 +90,15 @@ def zip_and_send_letter_pdfs(filenames_to_zip):
         zip_data = get_zip_of_letter_pdfs_from_s3(filenames_to_zip)
         zip_file_name = get_dvla_file_name(file_ext='.zip')
 
+        # upload a record to s3 of each zip file we send to DVLA - this is just an empty file so we can match up
+        # our own filenames with DVLA's acknowledgement file.
+        utils_s3upload(
+            filedata=b'',
+            region=current_app.config['AWS_REGION'],
+            bucket_name=current_app.config['LETTERS_PDF_BUCKET_NAME'],
+            file_location='{}/zips_sent/{}.TXT'.format(folder_date, zip_file_name)
+        )
+
         # temporary upload of zip file to s3 before sending it to DVLA
         # should be deprecated once the dvla text file is retired
         start_time = datetime.now()
