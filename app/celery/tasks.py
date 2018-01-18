@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from flask import current_app
 
@@ -93,7 +94,7 @@ def zip_and_send_letter_pdfs(filenames_to_zip):
         # upload a record to s3 of each zip file we send to DVLA - this is just an empty file so we can match up
         # our own filenames with DVLA's acknowledgement file.
         utils_s3upload(
-            filedata=b'',
+            filedata=json.dumps(filenames_to_zip).encode(),
             region=current_app.config['AWS_REGION'],
             bucket_name=current_app.config['LETTERS_PDF_BUCKET_NAME'],
             file_location='{}/zips_sent/{}.TXT'.format(folder_date, zip_file_name)
