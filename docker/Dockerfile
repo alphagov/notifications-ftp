@@ -18,36 +18,18 @@ RUN \
 		git \
 		build-essential \
 		zip \
-		libpq-dev \
-		jq \
-		libffi-dev \
-		python-dev \
+		libpq-dev
 
-	&& echo "Clean up" \
-	&& rm -rf /var/lib/apt/lists/* /tmp/*
-
+# these are declared statically here so that they're cached by the docker image - if we run after the `COPY` command
+# they won't be cached so it'll re-download every time. But these don't involve the filesystem
+COPY requirements.txt .
+COPY requirements_for_test.txt .
 RUN \
-	echo "Install global pip packages" \
-	&& pip install \
-		virtualenv \
-		awscli \
-		wheel
-
-COPY tianon.gpg /tmp/tianon.gpg
-
-RUN \
-	echo "Install gosu" \
-	&& curl -sSL -o /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
-	&& curl -sSL -o /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
-	&& export GNUPGHOME="$(mktemp -d)" \
-	&& gpg --import /tmp/tianon.gpg \
-	&& gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-	&& rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
-	&& chmod +x /usr/local/bin/gosu \
-	&& gosu nobody true
+	echo "Installing python dependencies" \
+	&& pip install -r requirements_for_test.txt
 
 WORKDIR /var/project
 
-COPY entrypoint.sh /usr/local/bin/docker-entrypoint
-
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
+# Copy from the real world, one dir up (project root) into the environment's current working directory
+# Docker will rebuild from here down every time.
+COPY . .
