@@ -49,7 +49,7 @@ def test_should_upload_zip_of_letter_pdfs_to_s3(notify_ftp, mocks):
         call(
             bucket_name=current_app.config['LETTERS_PDF_BUCKET_NAME'],
             file_location='{}/zips_sent/{}.TXT'.format('2017-01-01', zip_filename),
-            filedata=b'',
+            filedata=b'["2017-01-01/TEST1.PDF"]',
             region='eu-west-1'
         ),
         call(
