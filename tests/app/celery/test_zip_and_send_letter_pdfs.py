@@ -38,10 +38,9 @@ def test_should_get_zip_of_letter_pdfs_from_s3(mocks):
     mocks.get_zip_of_letter_pdfs_from_s3.assert_called_once_with(filenames)
 
 
-def test_should_upload_zip_of_letter_pdfs_to_s3(notify_ftp, mocks):
+def test_should_upload_record_of_zipfile_contents_to_s3(notify_ftp, mocks):
     filenames = ['2017-01-01/TEST1.PDF']
     zip_filename = get_dvla_file_name(dt=datetime(2017, 1, 1, 17, 30), file_ext='.zip')
-    location = '{}/{}'.format('2017-01-01', zip_filename)
 
     zip_and_send_letter_pdfs(filenames)
 
@@ -50,12 +49,6 @@ def test_should_upload_zip_of_letter_pdfs_to_s3(notify_ftp, mocks):
             bucket_name=current_app.config['LETTERS_PDF_BUCKET_NAME'],
             file_location='{}/zips_sent/{}.TXT'.format('2017-01-01', zip_filename),
             filedata=b'["2017-01-01/TEST1.PDF"]',
-            region='eu-west-1'
-        ),
-        call(
-            bucket_name=current_app.config['LETTERS_PDF_BUCKET_NAME'],
-            file_location=location,
-            filedata=b'\x00\x01',
             region='eu-west-1'
         )
     ]

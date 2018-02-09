@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 from flask import current_app
 
 from botocore.exceptions import ClientError
@@ -91,33 +90,13 @@ def zip_and_send_letter_pdfs(filenames_to_zip):
         zip_data = get_zip_of_letter_pdfs_from_s3(filenames_to_zip)
         zip_file_name = get_dvla_file_name(file_ext='.zip')
 
-        # upload a record to s3 of each zip file we send to DVLA - this is just an empty file so we can match up
-        # our own filenames with DVLA's acknowledgement file.
+        # upload a record to s3 of each zip file we send to DVLA - this is just a list of letter filenames so we can
+        # match up their references with DVLA
         utils_s3upload(
             filedata=json.dumps(filenames_to_zip).encode(),
             region=current_app.config['AWS_REGION'],
             bucket_name=current_app.config['LETTERS_PDF_BUCKET_NAME'],
             file_location='{}/zips_sent/{}.TXT'.format(folder_date, zip_file_name)
-        )
-
-        # temporary upload of zip file to s3 before sending it to DVLA
-        # should be deprecated once the dvla text file is retired
-        start_time = datetime.now()
-        utils_s3upload(
-            filedata=zip_data,
-            region=current_app.config['AWS_REGION'],
-            bucket_name=current_app.config['LETTERS_PDF_BUCKET_NAME'],
-            file_location='{}/{}'.format(folder_date, zip_file_name)
-        )
-        elapsed_time = datetime.now() - start_time
-        current_app.logger.info(
-            "Uploaded {file_count} letter PDFs in zip {location}, size {size} to {bucket} in {elapsed_time}".format(
-                file_count=len(filenames_to_zip),
-                location='{}/{}'.format(folder_date, zip_file_name),
-                size=len(zip_data),
-                bucket=current_app.config['LETTERS_PDF_BUCKET_NAME'],
-                elapsed_time=elapsed_time.total_seconds()
-            )
         )
         ftp_client.send_zip(zip_data, zip_file_name)
     except ClientError:
