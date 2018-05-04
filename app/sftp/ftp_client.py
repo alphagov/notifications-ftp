@@ -2,7 +2,7 @@ import os
 
 import pysftp
 from flask import current_app
-from monotonic import monotonic
+from time import monotonic
 
 from app.files.file_utils import get_dvla_file_name, get_new_dvla_filename
 
