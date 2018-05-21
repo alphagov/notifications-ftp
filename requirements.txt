@@ -7,7 +7,7 @@ statsd==3.2.1
 credstash==1.8.0
 Flask==0.10.1
 Flask-Script==2.0.5
-celery==3.1.25
+celery==4.1.1
 monotonic==1.2
 boto3==1.6.16
 awscli==1.14.70
