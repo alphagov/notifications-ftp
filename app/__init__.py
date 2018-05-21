@@ -1,5 +1,5 @@
 import os
-from monotonic import monotonic
+from time import monotonic
 
 from app.celery.celery import NotifyCelery
 from app.sftp.ftp_client import FtpClient

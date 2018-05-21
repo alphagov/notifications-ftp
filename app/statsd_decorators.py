@@ -2,7 +2,7 @@ import functools
 
 from app import statsd_client
 from flask import current_app
-from monotonic import monotonic
+from time import monotonic
 
 
 def statsd(namespace):
