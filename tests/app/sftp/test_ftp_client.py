@@ -7,7 +7,7 @@ from app.sftp.ftp_client import upload_file, upload_zip, FtpException
 
 
 @pytest.fixture
-def mocks():
+def mocks(client):
     class SendZipMocks:
         mock_bad_lstat = Mock(st_size=10)
         mock_lstat = Mock(st_size=1)
