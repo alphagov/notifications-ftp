@@ -62,8 +62,9 @@ class Config(object):
 
 
 class Development(Config):
-    NOTIFICATION_QUEUE_PREFIX = 'development'
     DEBUG = True
+    NOTIFICATION_QUEUE_PREFIX = 'development'
+    NOTIFY_LOG_PATH = 'application.log'
     LOCAL_FILE_STORAGE_PATH = "/tmp/dvla-file-storage"
 
     DVLA_JOB_BUCKET_NAME = 'development-dvla-file-per-job'
@@ -72,11 +73,8 @@ class Development(Config):
     LETTERS_PDF_BUCKET_NAME = 'development-letters-pdf'
 
 
-class Test(Config):
-    DEBUG = True
-    STATSD_ENABLED = True
-    STATSD_HOST = "localhost"
-    STATSD_PORT = 1000
+class Test(Development):
+    STATSD_ENABLED = False
     LOCAL_FILE_STORAGE_PATH = "/tmp/dvla-file-storage"
 
     DVLA_JOB_BUCKET_NAME = 'test-dvla-file-per-job'
