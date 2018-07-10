@@ -4,7 +4,6 @@ from monotonic import monotonic
 from app.celery.celery import NotifyCelery
 from app.sftp.ftp_client import FtpClient
 from flask import (
-    Flask,
     request,
     jsonify,
     g
@@ -16,9 +15,7 @@ statsd_client = StatsdClient()
 ftp_client = FtpClient()
 
 
-def create_app():
-    application = Flask(__name__)
-
+def create_app(application):
     from app.config import configs
 
     notify_environment = os.environ['NOTIFY_ENVIRONMENT']
@@ -33,10 +30,8 @@ def create_app():
     ftp_client.init_app(application, statsd_client)
 
     from app.status.status import status_blueprint
-    from app.sender.sender import sender_blueprint
 
     application.register_blueprint(status_blueprint)
-    application.register_blueprint(sender_blueprint)
 
     return application
 

@@ -1,11 +1,7 @@
-import os
-
+#!/usr/bin/env python
+from flask import Flask
 from app import create_app
-from credstash import getAllSecrets
 
-os.environ.update(getAllSecrets(region="eu-west-1"))
+application = Flask('application')
 
-application = create_app()
-
-if __name__ == "__main__":
-    application.run()
+create_app(application)

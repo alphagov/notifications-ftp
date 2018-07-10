@@ -25,14 +25,9 @@ mkvirtualenv -p /usr/local/bin/python3 notifications-ftp
 
 First, run `scripts/bootstrap.sh` to install dependencies.
 
-You need to run the flask application and a local celery instance.
+You need to run the local celery instance. There is a flask app, however this is only used by ELB to keep the instances healthy.
 
 There are three run scripts for running all the necessary parts.
-
-Flask endpoints
-```
-scripts/run_app.sh
-```
 
 Celery queue reader
 ```

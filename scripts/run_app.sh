@@ -3,5 +3,5 @@
 set -e
 
 source environment.sh
-python3 application.py runserver
 
+FLASK_APP=wsgi.py flask run -p 6015
