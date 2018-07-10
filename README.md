@@ -27,9 +27,8 @@ First, run `scripts/bootstrap.sh` to install dependencies.
 
 You need to run the local celery instance. There is a flask app, however this is only used by ELB to keep the instances healthy.
 
-There are three run scripts for running all the necessary parts.
+All you need to do is run the celery queue reader.
 
-Celery queue reader
 ```
 scripts/run_celery.sh
 ```

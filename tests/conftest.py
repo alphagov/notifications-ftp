@@ -9,7 +9,7 @@ from app import create_app
 
 @pytest.fixture(scope='session')
 def notify_ftp():
-    app = Flask('app')
+    app = Flask('test')
     app = create_app(app)
 
     ctx = app.app_context()
