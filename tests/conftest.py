@@ -2,14 +2,15 @@ import os
 import shutil
 
 import pytest
-from flask import current_app
+from flask import Flask, current_app
 
 from app import create_app
 
 
 @pytest.fixture(scope='session')
 def notify_ftp():
-    app = create_app()
+    app = Flask('test')
+    app = create_app(app)
 
     ctx = app.app_context()
     ctx.push()
