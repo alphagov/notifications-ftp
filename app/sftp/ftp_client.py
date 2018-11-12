@@ -57,11 +57,21 @@ def upload_zip(sftp, zip_data, filename, statsd_client):
             filename
         ))
 
-    with sftp.open('{}/{}'.format(sftp.pwd, filename), mode='xw') as remote_file:
-        remote_file.write(zip_data)
+    try:
+        with sftp.open('{}/{}'.format(sftp.pwd, filename), mode='xw') as remote_file:
+            remote_file.write(zip_data)
+    except OSError as e:
+        current_app.logger.exception(
+            "Exception occurred when uploading zip, checking if file was uploaded with the right size"
+        )
+        check_file_uploaded(filename, sftp, zip_data_len)
 
     statsd_client.timing("ftp-client.zip-upload-time", monotonic() - start_time)
 
+    check_file_uploaded(filename, sftp, zip_data_len)
+
+
+def check_file_uploaded(filename, sftp, zip_data_len):
     if filename in sftp.listdir():
         stats = sftp.lstat('{}/{}'.format(sftp.pwd, filename))
         if stats.st_size != zip_data_len:
