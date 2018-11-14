@@ -121,3 +121,30 @@ def test_send_zip_errors_if_remote_file_size_is_different(mocks):
 
     with pytest.raises(FtpException):
         upload_zip(mock_zip_sftp, mocks.mock_data, mocks.mock_remote_filename, Mock())
+
+
+def test_send_zip_file_completes_if_exception_thrown_but_files_exists(client, mocker):
+    filename = 'Notify-pdfs.zip'
+    sftp = Mock(
+        pwd='~/notify',
+        exists=Mock(return_value=False),
+        listdir=Mock(return_value=[filename]),
+        lstat=Mock(return_value=Mock(st_size=len(b'some data'))),
+        open=Mock(side_effect=OSError("Connection didn't work")),
+    )
+    upload_zip(sftp, b'some data', filename, Mock())
+    sftp.lstat.assert_called_once_with('~/notify/{}'.format(filename))
+
+
+def test_send_zip_file_throws_exception_if_file_does_not_exist(client, mocker):
+    filename = 'Notify-pdfs.zip'
+    sftp = Mock(
+        pwd='~/notify',
+        exists=Mock(return_value=False),
+        listdir=Mock(return_value=["no_file_here.txt"]),
+        open=Mock(side_effect=OSError("Connection didn't work")),
+    )
+    with pytest.raises(expected_exception=FtpException) as e:
+        upload_zip(sftp, b'some data', filename, Mock())
+        sftp.listdir.assert_called_once_with('~/notify/{}'.format(filename))
+        assert e.message == 'something'
