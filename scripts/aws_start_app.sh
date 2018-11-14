@@ -5,10 +5,9 @@ set -eo pipefail
 function start
 {
   service=$1
-  if [ -e "/etc/init/${service}.conf" ]
-  then
+  if [ -e "/etc/systemd/system/${service}.service" ]; then
     echo "Starting ${service}"
-    service ${service} start
+    systemctl start "${service}"
   fi
 }
 
