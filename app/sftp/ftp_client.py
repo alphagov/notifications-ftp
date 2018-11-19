@@ -38,6 +38,9 @@ class FtpClient():
     def send_zip(self, zip_data, filename):
         self._send(upload_zip, zip_data, filename, self.statsd_client)
 
+    def file_exists_with_correct_size(self, filename, zip_data_len):
+        self._send(check_file_exist_and_is_right_size, filename, zip_data_len)
+
 
 def upload_zip(sftp, zip_data, filename, statsd_client):
     sftp.chdir(NOTIFY_SUBFOLDER)
@@ -62,14 +65,17 @@ def upload_zip(sftp, zip_data, filename, statsd_client):
 
     statsd_client.timing("ftp-client.zip-upload-time", monotonic() - start_time)
 
+    check_file_exist_and_is_right_size(sftp, filename, zip_data_len)
+    current_app.logger.info("Data {} uploaded to DVLA".format(filename))
+
+
+def check_file_exist_and_is_right_size(sftp, filename, zip_data_len):
     if filename in sftp.listdir():
         stats = sftp.lstat('{}/{}'.format(sftp.pwd, filename))
         if stats.st_size != zip_data_len:
             raise FtpException(
                 "Zip file {} uploaded but size is incorrect: is {}, expected {}".format(
                     filename, stats.st_size, zip_data_len))
-        else:
-            current_app.logger.info("Data {} uploaded to DVLA".format(filename))
     else:
         raise FtpException("Zip file {} not uploaded".format(filename))
 
