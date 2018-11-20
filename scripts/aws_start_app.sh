@@ -8,6 +8,9 @@ function start
   if [ -e "/etc/systemd/system/${service}.service" ]; then
     echo "Starting ${service}"
     systemctl start "${service}"
+  elif [ -e "/etc/init/${service}.conf" ]; then
+    echo "Starting ${service}"
+    service "${service}" start
   fi
 }
 
