@@ -5,13 +5,19 @@ set -eo pipefail
 function stop
 {
   service=$1
-  if [ -e "/etc/init/${service}.conf" ]; then
-    echo "stopping ${service}"
-    if service ${service} stop; then
-      echo "${service} stopped"
-    else
-      >&2 echo "Could not stop ${service}"
-    fi
+  stop_command="false"
+  if [ -e "/etc/systemd/system/${service}.service" ]; then
+    stop_command="systemctl stop ${service}"
+  elif [ -e "/etc/init/${service}.conf" ]; then
+    stop_command="service ${service} stop"
+  fi
+
+  echo "stopping ${service}"
+
+  if [ "$($stop_command)" ]; then
+    echo "${service} stopped"
+  else
+    >&2 echo "Could not stop ${service}"
   fi
 }
 
