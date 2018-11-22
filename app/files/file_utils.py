@@ -53,15 +53,10 @@ def get_api_from_s3(filename):
 
 
 def get_zip_of_letter_pdfs_from_s3(filenames):
-    folder_date = filenames[0].split('/')[0]
-
     bucket_name = current_app.config['LETTERS_PDF_BUCKET_NAME']
     imz = InMemoryZip()
 
     for i, filename in enumerate(filenames):
-        if i % 100 == 0:
-            current_app.logger.info('Zipping {} of {} letter PDFs from {}'.format(
-                i, len(filenames), folder_date))
         pdf_filename = filename.split('/')[-1]
         pdf_file = _get_file_from_s3_in_memory(bucket_name, filename)
         imz.append(pdf_filename, pdf_file)
