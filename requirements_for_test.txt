@@ -1,6 +1,6 @@
 -r requirements.txt
 flake8==3.7.3
-pytest==3.6.2
+pytest==4.2.1
 pytest-mock==1.10.0
 pytest-cov==2.5.1
 pytest-env==0.6.2
