@@ -20,6 +20,9 @@ def mocks(mocker, client):
         )
         upload_to_s3 = mocker.patch('app.celery.tasks.utils_s3upload')
         send_zip = mocker.patch('app.celery.tasks.ftp_client.send_zip')
+        file_exists_with_correct_size = mocker.patch(
+            'app.celery.tasks.ftp_client.file_exists_with_correct_size'
+        )
         send_task = mocker.patch('app.notify_celery.send_task')
         get_notification_references_from_s3_filenames = mocker.patch(
             'app.celery.tasks.get_notification_references_from_s3_filenames',
@@ -78,6 +81,7 @@ def test_zip_and_send_should_update_notifications_to_success(mocks):
 
     zip_and_send_letter_pdfs(filenames)
 
+    assert not mocks.file_exists_with_correct_size.called
     mocks.send_task.assert_called_once_with(
         name='update-letter-notifications-to-sent',
         args=(['1', '2', '3'],),
@@ -98,14 +102,30 @@ def test_zip_and_send_should_update_notifications_if_s3_client_error(mocks):
     )
 
 
-def test_zip_and_send_should_update_notifications_if_ftp_error(mocks):
+def test_zip_and_send_should_update_notifications_to_error_if_send_zip_fails_and_files_did_not_upload(mocks):
+    mocks.send_zip.side_effect = FtpException
+    mocks.file_exists_with_correct_size.side_effect = FtpException
+
+    filenames = ['2017-01-01/TEST1.PDF']
+    zip_and_send_letter_pdfs(filenames)
+
+    mocks.file_exists_with_correct_size.assert_called_once_with('NOTIFY.20170101173000.ZIP', 2)
+    mocks.send_task.assert_called_once_with(
+        name='update-letter-notifications-to-error',
+        args=(['1', '2', '3'],),
+        queue='notify-internal-tasks'
+    )
+
+
+def test_zip_and_send_should_update_notifications_to_success_if_send_zip_fails_but_files_uploaded(mocks):
     mocks.send_zip.side_effect = FtpException
 
     filenames = ['2017-01-01/TEST1.PDF']
     zip_and_send_letter_pdfs(filenames)
 
+    mocks.file_exists_with_correct_size.assert_called_once_with('NOTIFY.20170101173000.ZIP', 2)
     mocks.send_task.assert_called_once_with(
-        name='update-letter-notifications-to-error',
+        name='update-letter-notifications-to-sent',
         args=(['1', '2', '3'],),
         queue='notify-internal-tasks'
     )

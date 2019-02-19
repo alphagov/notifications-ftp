@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 import pysftp
 from flask import current_app
 from monotonic import monotonic
@@ -18,23 +20,26 @@ class FtpClient():
         self.password = app.config.get('FTP_PASSWORD')
         self.statsd_client = statsd_client
 
-    def _send(self, func, *args):
+    @contextmanager
+    def _sftp(self):
         try:
             cnopts = pysftp.CnOpts()
             cnopts.hostkeys = None
             current_app.logger.info("opening connection to {}".format(self.host))
             with pysftp.Connection(self.host, username=self.username, password=self.password, cnopts=cnopts) as sftp:
-                func(sftp, *args)
+                yield sftp
         except Exception as e:
             # reraise all exceptions as FtpException to ensure we can handle them down the line
             current_app.logger.exception(e)
             raise FtpException("Failed to sFTP file")
 
     def send_zip(self, zip_data, filename):
-        self._send(upload_zip, zip_data, filename, self.statsd_client)
+        with self._sftp() as sftp:
+            upload_zip(sftp, zip_data, filename, self.statsd_client)
 
     def file_exists_with_correct_size(self, filename, zip_data_len):
-        self._send(check_file_exist_and_is_right_size, filename, zip_data_len)
+        with self._sftp() as sftp:
+            check_file_exist_and_is_right_size(sftp, filename, zip_data_len)
 
 
 def upload_zip(sftp, zip_data, filename, statsd_client):
