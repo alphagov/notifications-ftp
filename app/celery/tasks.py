@@ -49,6 +49,7 @@ def zip_and_send_letter_pdfs(filenames_to_zip):
             # check if file exists with the right size.
             # It has happened that an IOError occurs but the files are present on the remote server.
             ftp_client.file_exists_with_correct_size(zip_file_name, len(zip_data))
+            task_name = "update-letter-notifications-to-sent"
         except FtpException:
             current_app.logger.exception('FTP app failed to send api messages')
             task_name = "update-letter-notifications-to-error"

@@ -2,7 +2,6 @@
 SHELL := /bin/bash
 DATE = $(shell date +%Y-%m-%d:%H:%M:%S)
 
-PIP_ACCEL_CACHE ?= ${CURDIR}/cache/pip-accel
 APP_VERSION_FILE = app/version.py
 
 GIT_BRANCH ?= $(shell git symbolic-ref --short HEAD 2> /dev/null || echo "detached")
