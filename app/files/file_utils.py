@@ -1,5 +1,4 @@
-import os
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from flask import current_app
 import boto3
@@ -13,14 +12,6 @@ DVLA_ZIP_FILENAME_FORMAT = 'NOTIFY.%Y%m%d%H%M%S.ZIP'
 def get_dvla_file_name(dt=None, file_ext='.txt'):
     dt = dt or datetime.utcnow()
     return dt.strftime(_get_dvla_format(file_ext))
-
-
-def get_new_dvla_filename(old_filename):
-    file_ext = os.path.splitext(old_filename)[1]
-    # increment the time by one minute
-    old_datetime = datetime.strptime(old_filename, _get_dvla_format(file_ext))
-
-    return get_dvla_file_name(dt=old_datetime + timedelta(minutes=1), file_ext=file_ext)
 
 
 def get_zip_of_letter_pdfs_from_s3(filenames):

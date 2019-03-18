@@ -34,24 +34,38 @@ def test_send_zip_generates_remote_filename(mocks):
     upload_zip(mock_zip_sftp, mocks.mock_data, mocks.mock_remote_filename, Mock())
 
     mock_zip_sftp.chdir.assert_called_once_with('notify')
-    mock_zip_sftp.open.assert_called_once_with('~/notify/' + mocks.mock_remote_filename, mode='xw')
+    mock_zip_sftp.open.assert_called_once_with('~/notify/' + mocks.mock_remote_filename, mode='w')
 
 
 @freeze_time('2016-01-01T17:00:00')
-def test_send_zip_increments_filename_if_exists(mocks):
-    mock_new_remote_filename = 'NOTIFY.20160101170100.ZIP'
-
+def test_send_zip_doesnt_overwrite_if_file_exists_with_same_size(mocks):
     mock_zip_sftp = Mock(
         pwd='~/notify',
         exists=Mock(return_value=True),
-        listdir=Mock(return_value=[mock_new_remote_filename]),
+        listdir=Mock(return_value=[mocks.mock_remote_filename]),
         open=Mock(return_value=mocks.mock_remote_file),
         lstat=Mock(return_value=mocks.mock_lstat),
     )
 
     upload_zip(mock_zip_sftp, mocks.mock_data, mocks.mock_remote_filename, Mock())
 
-    mock_zip_sftp.open.assert_called_once_with('~/notify/' + mock_new_remote_filename, mode='xw')
+    assert mock_zip_sftp.open.called is False
+
+
+@freeze_time('2016-01-01T17:00:00')
+def test_send_zip_overwrites_if_file_exists_with_different_size(mocks):
+    mock_zip_sftp = Mock(
+        pwd='~/notify',
+        exists=Mock(return_value=True),
+        listdir=Mock(return_value=[mocks.mock_remote_filename]),
+        open=Mock(return_value=mocks.mock_remote_file),
+        # first time it's called, there's the old file, then we overwrite and put in the new file instead
+        lstat=Mock(side_effect=[mocks.mock_bad_lstat, mocks.mock_lstat]),
+    )
+
+    upload_zip(mock_zip_sftp, mocks.mock_data, mocks.mock_remote_filename, Mock())
+
+    mock_zip_sftp.open.assert_called_once_with('~/notify/' + mocks.mock_remote_filename, mode='w')
 
 
 @freeze_time('2016-01-01T17:00:00')
