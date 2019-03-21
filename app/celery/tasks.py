@@ -31,6 +31,8 @@ def zip_and_send_letter_pdfs(filenames_to_zip, upload_filename):
     try:
         zip_data = get_zip_of_letter_pdfs_from_s3(filenames_to_zip)
 
+        ftp_client.send_zip(zip_data, upload_filename)
+
         # upload a record to s3 of each zip file we send to DVLA - this is just a list of letter filenames so we can
         # match up their references with DVLA
         utils_s3upload(
@@ -39,7 +41,6 @@ def zip_and_send_letter_pdfs(filenames_to_zip, upload_filename):
             bucket_name=current_app.config['LETTERS_PDF_BUCKET_NAME'],
             file_location='{}/zips_sent/{}.TXT'.format(folder_date, upload_filename)
         )
-        ftp_client.send_zip(zip_data, upload_filename)
     except ClientError:
         current_app.logger.exception('FTP app failed to download PDF from S3 bucket {}'.format(folder_date))
         task_name = "update-letter-notifications-to-error"
