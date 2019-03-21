@@ -18,19 +18,20 @@ NOTIFY_QUEUE = 'notify-internal-tasks'
 
 @notify_celery.task(name="zip-and-send-letter-pdfs")
 @statsd(namespace="tasks")
-def zip_and_send_letter_pdfs(filenames_to_zip):
+def zip_and_send_letter_pdfs(filenames_to_zip, upload_filename=None):
     folder_date = filenames_to_zip[0].split('/')[0]
+    zip_file_name = upload_filename or get_dvla_file_name(file_ext='.zip')
 
     current_app.logger.info(
-        "Starting to zip {file_count} letter PDFs in memory from {folder}".format(
+        "Starting to zip {file_count} letter PDFs in memory from {folder} into dvla file {upload_filename}".format(  # noqa
             file_count=len(filenames_to_zip),
-            folder=folder_date
+            folder=folder_date,
+            upload_filename=zip_file_name
         )
     )
 
     try:
         zip_data = get_zip_of_letter_pdfs_from_s3(filenames_to_zip)
-        zip_file_name = get_dvla_file_name(file_ext='.zip')
 
         # upload a record to s3 of each zip file we send to DVLA - this is just a list of letter filenames so we can
         # match up their references with DVLA

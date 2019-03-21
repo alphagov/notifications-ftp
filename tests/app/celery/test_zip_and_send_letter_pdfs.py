@@ -1,5 +1,5 @@
 from datetime import datetime
-from unittest.mock import call
+from unittest.mock import call, ANY
 
 from flask import current_app
 from freezegun import freeze_time
@@ -143,3 +143,16 @@ def test_zip_and_send_should_update_notifications_to_success_in_1k_batches(mocke
     assert mocks.send_task.mock_calls[0][2]['args'] == (list(range(1000)),)
     assert mocks.send_task.mock_calls[1][2]['args'] == (list(range(1000, 2000)),)
     assert mocks.send_task.mock_calls[2][2]['args'] == (list(range(2000, 3000)),)
+
+
+def test_zip_and_send_accepts_a_specified_filename(mocks):
+    filenames = ['2017-01-01/TEST1.PDF']
+    zip_and_send_letter_pdfs(filenames, upload_filename='MY_NAME.ZIP')
+
+    mocks.send_zip.assert_called_once_with(ANY, 'MY_NAME.ZIP')
+    mocks.upload_to_s3.assert_called_once_with(
+        bucket_name=ANY,
+        file_location='2017-01-01/zips_sent/MY_NAME.ZIP.TXT',
+        filedata=ANY,
+        region=ANY
+    )

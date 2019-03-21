@@ -4,8 +4,6 @@ import pysftp
 from flask import current_app
 from monotonic import monotonic
 
-from app.files.file_utils import get_new_dvla_filename
-
 NOTIFY_SUBFOLDER = 'notify'
 
 
@@ -51,16 +49,18 @@ def upload_zip(sftp, zip_data, filename, statsd_client):
     start_time = monotonic()
 
     if sftp.exists('{}/{}'.format(sftp.pwd, filename)):
-        # increment the time in the filename by one minute - if there's ALSO a file with that name, then
-        # lets just give up as something's definitely gone weird.
-        old_filename = filename
-        filename = get_new_dvla_filename(filename)
-        current_app.logger.warning('{} already exists on DVLA ftp, renaming to {}'.format(
-            old_filename,
-            filename
-        ))
+        stats = sftp.lstat('{}/{}'.format(sftp.pwd, filename))
+        if stats.st_size == zip_data_len:
+            current_app.logger.info('{} already exists on DVLA ftp with matching filesize {}, skipping'.format(
+                filename, stats.st_size
+            ))
+            return
+        else:
+            current_app.logger.info('{} already exists on DVLA ftp with different filesize {}, overwriting'.format(
+                filename, stats.st_size
+            ))
 
-    with sftp.open('{}/{}'.format(sftp.pwd, filename), mode='xw') as remote_file:
+    with sftp.open('{}/{}'.format(sftp.pwd, filename), mode='w') as remote_file:
         remote_file.write(zip_data)
 
     statsd_client.timing("ftp-client.zip-upload-time", monotonic() - start_time)

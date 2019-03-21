@@ -9,7 +9,6 @@ from flask import current_app
 from freezegun import freeze_time
 from app.files.file_utils import (
     get_dvla_file_name,
-    get_new_dvla_filename,
     get_zip_of_letter_pdfs_from_s3,
     _get_file_from_s3_in_memory,
     get_notification_references_from_s3_filenames
@@ -27,15 +26,6 @@ FOO_SUBFOLDER = '/tmp/dvla-file-storage/foo'
 def test_get_dvla_file_name(file_ext, remote_filename):
     with freeze_time('2016-01-01T17:00:00'):
         assert get_dvla_file_name(file_ext=file_ext) == remote_filename
-
-
-@pytest.mark.parametrize('old_filename,remote_filename', [
-    ('Notify-201601011759-rq.txt', 'Notify-201601011800-rq.txt'),
-    ('NOTIFY.20160101175900.ZIP', 'NOTIFY.20160101180000.ZIP')
-])
-def test_get_new_dvla_file_name(old_filename, remote_filename):
-    # increment from 17:59 to 18:00
-    assert get_new_dvla_filename(old_filename) == remote_filename
 
 
 def test_get_notification_references_from_s3():
