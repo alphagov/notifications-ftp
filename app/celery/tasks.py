@@ -8,7 +8,6 @@ from app import notify_celery, ftp_client
 from app.files.file_utils import (
     get_zip_of_letter_pdfs_from_s3,
     get_notification_references_from_s3_filenames,
-    get_dvla_file_name,
 )
 from app.statsd_decorators import statsd
 from app.sftp.ftp_client import FtpException
@@ -18,20 +17,21 @@ NOTIFY_QUEUE = 'notify-internal-tasks'
 
 @notify_celery.task(name="zip-and-send-letter-pdfs")
 @statsd(namespace="tasks")
-def zip_and_send_letter_pdfs(filenames_to_zip, upload_filename=None):
+def zip_and_send_letter_pdfs(filenames_to_zip, upload_filename):
     folder_date = filenames_to_zip[0].split('/')[0]
-    zip_file_name = upload_filename or get_dvla_file_name(file_ext='.zip')
 
     current_app.logger.info(
         "Starting to zip {file_count} letter PDFs in memory from {folder} into dvla file {upload_filename}".format(  # noqa
             file_count=len(filenames_to_zip),
             folder=folder_date,
-            upload_filename=zip_file_name
+            upload_filename=upload_filename
         )
     )
 
     try:
         zip_data = get_zip_of_letter_pdfs_from_s3(filenames_to_zip)
+
+        ftp_client.send_zip(zip_data, upload_filename)
 
         # upload a record to s3 of each zip file we send to DVLA - this is just a list of letter filenames so we can
         # match up their references with DVLA
@@ -39,9 +39,8 @@ def zip_and_send_letter_pdfs(filenames_to_zip, upload_filename=None):
             filedata=json.dumps(filenames_to_zip).encode(),
             region=current_app.config['AWS_REGION'],
             bucket_name=current_app.config['LETTERS_PDF_BUCKET_NAME'],
-            file_location='{}/zips_sent/{}.TXT'.format(folder_date, zip_file_name)
+            file_location='{}/zips_sent/{}.TXT'.format(folder_date, upload_filename)
         )
-        ftp_client.send_zip(zip_data, zip_file_name)
     except ClientError:
         current_app.logger.exception('FTP app failed to download PDF from S3 bucket {}'.format(folder_date))
         task_name = "update-letter-notifications-to-error"
@@ -49,7 +48,7 @@ def zip_and_send_letter_pdfs(filenames_to_zip, upload_filename=None):
         try:
             # check if file exists with the right size.
             # It has happened that an IOError occurs but the files are present on the remote server.
-            ftp_client.file_exists_with_correct_size(zip_file_name, len(zip_data))
+            ftp_client.file_exists_with_correct_size(upload_filename, len(zip_data))
             task_name = "update-letter-notifications-to-sent"
         except FtpException:
             current_app.logger.exception('FTP app failed to send api messages')

@@ -4,11 +4,9 @@ from zipfile import ZipFile
 
 import boto3
 from moto import mock_s3
-import pytest
 from flask import current_app
-from freezegun import freeze_time
+
 from app.files.file_utils import (
-    get_dvla_file_name,
     get_zip_of_letter_pdfs_from_s3,
     _get_file_from_s3_in_memory,
     get_notification_references_from_s3_filenames
@@ -16,16 +14,6 @@ from app.files.file_utils import (
 
 
 FOO_SUBFOLDER = '/tmp/dvla-file-storage/foo'
-
-
-@pytest.mark.parametrize('file_ext,remote_filename', [
-    (None, 'Notify-201601011700-rq.txt'),
-    ('.txt', 'Notify-201601011700-rq.txt'),
-    ('.zip', 'NOTIFY.20160101170000.ZIP')
-])
-def test_get_dvla_file_name(file_ext, remote_filename):
-    with freeze_time('2016-01-01T17:00:00'):
-        assert get_dvla_file_name(file_ext=file_ext) == remote_filename
 
 
 def test_get_notification_references_from_s3():
