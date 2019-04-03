@@ -7,7 +7,7 @@ from flask import Flask, current_app
 from app import create_app
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='session', autouse=True)
 def notify_ftp():
     app = Flask('test')
     app = create_app(app)

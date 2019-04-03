@@ -1,5 +1,6 @@
 from flask import current_app
 import boto3
+from botocore.exceptions import ClientError
 
 from app.files.in_memory_zip import InMemoryZip
 
@@ -28,3 +29,16 @@ def _get_file_from_s3_in_memory(bucket_name, filename):
         key=filename
     )
     return obj.get()["Body"].read()
+
+
+def file_exists_on_s3(bucket_name, filename):
+    s3 = boto3.resource('s3')
+    try:
+        s3.Object(bucket_name, filename).get()
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'NoSuchKey':
+            return False
+        else:
+            current_app.logger.exception('Error checking to see if {}/{} exists'.format(bucket_name, filename))
+            raise
+    return True

@@ -2,14 +2,17 @@ from io import BytesIO
 from unittest.mock import call
 from zipfile import ZipFile
 
+import pytest
 import boto3
+from botocore.exceptions import ClientError
 from moto import mock_s3
 from flask import current_app
 
 from app.files.file_utils import (
     get_zip_of_letter_pdfs_from_s3,
     _get_file_from_s3_in_memory,
-    get_notification_references_from_s3_filenames
+    get_notification_references_from_s3_filenames,
+    file_exists_on_s3
 )
 
 
@@ -60,3 +63,22 @@ def test_get_file_from_s3_in_memory_should_return_file_contents_on_successful_s3
     ret = _get_file_from_s3_in_memory(bucket_name, filename)
 
     assert ret == b'\x00'
+
+
+@pytest.mark.parametrize('filename, expected', [('foo.txt', True), ('bar.txt', False)])
+@mock_s3
+def test_file_exists_on_s3(filename, expected):
+    conn = boto3.resource('s3', region_name='eu-west-1')
+    conn.create_bucket(Bucket='bucket')
+    s3 = boto3.client('s3', region_name='eu-west-1')
+
+    s3.put_object(Bucket='bucket', Key='foo.txt', Body=b'\x00')
+
+    assert file_exists_on_s3('bucket', filename) is expected
+
+
+@mock_s3
+def test_file_exists_on_s3_reraises_on_unexpected_error():
+    with pytest.raises(ClientError):
+        # throws a NoSuchBucket
+        file_exists_on_s3('bucket', 'foo.txt')
