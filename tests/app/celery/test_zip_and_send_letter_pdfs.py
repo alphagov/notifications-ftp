@@ -143,7 +143,7 @@ def test_zip_and_send_should_update_notifications_to_success_in_1k_batches(mocke
     assert mocks.send_task.mock_calls[2][2]['args'] == (list(range(2000, 3000)),)
 
 
-def test_zip_and_send_should_skip_if_record_already_in_zips_sent(mocks):
+def test_zip_and_send_should_skip_if_record_already_in_zips_sent(mocks, caplog):
     mocks.file_exists_on_s3.return_value = True
 
     filenames = ['2017-01-01/TEST1.PDF']
@@ -155,6 +155,10 @@ def test_zip_and_send_should_skip_if_record_already_in_zips_sent(mocks):
     )
     # no update notification tasks should be triggered
     assert mocks.send_task.call_count == 0
+    assert any(
+        rec.message == '2017-01-01/zips_sent/foo.zip.TXT already exists, skipping dvla upload'
+        for rec in caplog.records
+    )
 
 
 def test_zip_and_send_should_set_to_error_if_cant_check_zips_sent(mocks):

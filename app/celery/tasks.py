@@ -32,7 +32,7 @@ def zip_and_send_letter_pdfs(filenames_to_zip, upload_filename):
 
     try:
         if file_exists_on_s3(current_app.config['LETTERS_PDF_BUCKET_NAME'], zips_sent_filename):
-            current_app.logger.error('{} already exists, skipping dvla upload')
+            current_app.logger.error('{} already exists, skipping dvla upload'.format(zips_sent_filename))
             return
 
         zip_data = get_zip_of_letter_pdfs_from_s3(filenames_to_zip)
