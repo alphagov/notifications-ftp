@@ -1,4 +1,4 @@
-cffi==1.12.1
+cffi==1.12.3
 gunicorn==19.9.0
 pyftpdlib==1.5.4
 pysftp==0.2.9
