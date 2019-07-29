@@ -72,6 +72,10 @@ class Development(Config):
 
     LETTERS_PDF_BUCKET_NAME = 'development-letters-pdf'
 
+    FTP_HOST = 'localhost'
+    FTP_USERNAME = os.getenv('USER')
+    FTP_PASSWORD = os.getenv('PASS')
+
 
 class Test(Development):
     STATSD_ENABLED = False
@@ -81,6 +85,10 @@ class Test(Development):
     DVLA_API_BUCKET_NAME = 'test-dvla-letter-api-files'
 
     LETTERS_PDF_BUCKET_NAME = 'test-letters-pdf'
+
+    FTP_HOST = 'ftp-host'
+    FTP_USERNAME = 'username'
+    FTP_PASSWORD = 'password'
 
 
 class Preview(Config):

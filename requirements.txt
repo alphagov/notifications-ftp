@@ -5,6 +5,7 @@ pysftp==0.2.9
 credstash==1.15.0
 Flask==1.0.3
 celery==3.1.26.post2 # pyup: <4
+pexpect==4.7.0
 
 git+https://github.com/alphagov/notifications-utils.git@29.3.1#egg=notifications-utils==29.3.1
 
