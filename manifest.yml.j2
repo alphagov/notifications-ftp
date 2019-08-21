@@ -1,0 +1,31 @@
+---
+applications:
+  - name: notify-ftp
+    buildpack: python_buildpack
+    no-route: true
+
+    memory: 2G
+
+    health-check-type: process
+
+    services:
+      - logit-ssl-syslog-drain
+
+    env:
+      NOTIFY_APP_NAME: notify-ftp
+      LOGGING_STDOUT_JSON: '1'
+
+      # Credentials variables
+      FTP_HOST: '{{ FTP_HOST }}'
+      FTP_USERNAME: '{{ FTP_USERNAME }}'
+      FTP_PASSWORD: '{{ FTP_PASSWORD }}'
+
+      NOTIFICATION_QUEUE_PREFIX: '{{ NOTIFICATION_QUEUE_PREFIX }}'
+      NOTIFY_ENVIRONMENT: '{{ NOTIFY_ENVIRONMENT }}'
+      NOTIFY_LOG_PATH: '/home/vcap/logs/app.log'
+
+
+      AWS_ACCESS_KEY_ID: '{{ AWS_ACCESS_KEY_ID }}'
+      AWS_SECRET_ACCESS_KEY: '{{ AWS_SECRET_ACCESS_KEY }}'
+
+      STATSD_PREFIX: '{{ STATSD_PREFIX }}'

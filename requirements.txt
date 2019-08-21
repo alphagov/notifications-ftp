@@ -3,6 +3,7 @@ gunicorn==19.9.0
 pyftpdlib==1.5.5
 pysftp==0.2.9
 Flask==1.0.3
+awscli-cwlogs>=1.4,<1.5
 celery==3.1.26.post2 # pyup: <4
 
 git+https://github.com/alphagov/notifications-utils.git@29.3.1#egg=notifications-utils==29.3.1
