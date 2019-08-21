@@ -20,32 +20,72 @@ BUILD_URL ?=
 
 DOCKER_CONTAINER_PREFIX = ${USER}-${BUILD_TAG}
 
+NOTIFY_CREDENTIALS ?= ~/.notify-credentials
+CF_APP = "notify-ftp"
+CF_ORG = "govuk-notify"
+
 .PHONY: help
 help:
 	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+.PHONY: generate-manifest
+generate-manifest:
+	$(if ${CF_APP},,$(error Must specify CF_APP))
+	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
+	$(if $(shell which gpg2), $(eval export GPG=gpg2), $(eval export GPG=gpg))
+	$(if ${GPG_PASSPHRASE_TXT}, $(eval export DECRYPT_CMD=echo -n $$$${GPG_PASSPHRASE_TXT} | ${GPG} --quiet --batch --passphrase-fd 0 --pinentry-mode loopback -d), $(eval export DECRYPT_CMD=${GPG} --quiet --batch -d))
+
+	@jinja2 --strict manifest.yml.j2 \
+	    -D environment=${CF_SPACE} \
+	    -D CF_APP=${CF_APP} \
+	    --format=yaml \
+	    <(${DECRYPT_CMD} ${NOTIFY_CREDENTIALS}/credentials/${CF_SPACE}/paas/ftp-environment-variables.gpg) 2>&1
+
+.PHONY: cf-target
+cf-target: check-env-vars
+	@cf target -o ${CF_ORG} -s ${CF_SPACE}
+
+.PHONY: cf-deploy
+cf-deploy: cf-target ## Deploys the app to Cloud Foundry
+	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
+	@cf app --guid ${CF_APP} || exit 1
+	# cancel any existing deploys to ensure we can apply manifest (if a deploy is in progress you'll see ScaleDisabledDuringDeployment)
+	cf v3-cancel-zdt-push ${CF_APP} || true
+
+	cf v3-apply-manifest ${CF_APP} -f <(make -s generate-manifest)
+	cf v3-zdt-push ${CF_APP} --wait-for-deploy-complete  # fails after 5 mins if deploy doesn't work
+
+.PHONY: cf-login
+cf-login: ## Log in to Cloud Foundry
+	$(if ${CF_USERNAME},,$(error Must specify CF_USERNAME))
+	$(if ${CF_PASSWORD},,$(error Must specify CF_PASSWORD))
+	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
+	@echo "Logging in to Cloud Foundry on ${CF_API}"
+	@cf login -a "${CF_API}" -u ${CF_USERNAME} -p "${CF_PASSWORD}" -o "${CF_ORG}" -s "${CF_SPACE}"
 
 .PHONY: check-env-vars
 check-env-vars: ## Check mandatory environment variables
 	$(if ${DEPLOY_ENV},,$(error Must specify DEPLOY_ENV))
 	$(if ${DNS_NAME},,$(error Must specify DNS_NAME))
-	$(if ${AWS_ACCESS_KEY_ID},,$(error Must specify AWS_ACCESS_KEY_ID))
-	$(if ${AWS_SECRET_ACCESS_KEY},,$(error Must specify AWS_SECRET_ACCESS_KEY))
 
 .PHONY: preview
 preview: ## Set environment to preview
 	$(eval export DEPLOY_ENV=preview)
+	$(eval export CF_SPACE=preview)
 	$(eval export DNS_NAME="notify.works")
 	@true
 
 .PHONY: staging
 staging: ## Set environment to staging
 	$(eval export DEPLOY_ENV=staging)
+	$(eval export CF_SPACE=staging)
 	$(eval export DNS_NAME="staging-notify.works")
 	@true
 
 .PHONY: production
 production: ## Set environment to production
 	$(eval export DEPLOY_ENV=production)
+	$(eval export CF_SPACE=production)
 	$(eval export DNS_NAME="notifications.service.gov.uk")
 	@true
 
@@ -94,17 +134,13 @@ clean-docker-containers: ## Clean up any remaining docker containers
 clean:
 	rm -rf cache target venv .coverage build tests/.cache wheelhouse
 
-.PHONY: build-codedeploy-artifact
-build-codedeploy-artifact: ## Build the deploy artifact for CodeDeploy
+.PHONY: build-paas-artifact
+build-paas-artifact: ## Build the deploy artifact for paas
 	rm -rf target
 	mkdir -p target
 	zip -y -q -r -x@deploy-exclude.lst target/notifications-ftp.zip ./
 
-.PHONY: upload-codedeploy-artifact ## Upload the deploy artifact for CodeDeploy
-upload-codedeploy-artifact: check-env-vars
+.PHONY: upload-paas-artifact ## Upload the deploy artifact for paas
+upload-paas-artifact: check-env-vars
 	$(if ${DEPLOY_BUILD_NUMBER},,$(error Must specify DEPLOY_BUILD_NUMBER))
 	aws s3 cp --region eu-west-1 --sse AES256 target/notifications-ftp.zip s3://${DNS_NAME}-codedeploy/notifications-ftp-${DEPLOY_BUILD_NUMBER}.zip
-
-.PHONY: deploy
-deploy: check-env-vars ## Trigger CodeDeploy for the api
-	aws deploy create-deployment --application-name notify-ftp --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name notify-ftp --s3-location bucket=${DNS_NAME}-codedeploy,key=notifications-ftp-${DEPLOY_BUILD_NUMBER}.zip,bundleType=zip --region eu-west-1
