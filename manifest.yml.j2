@@ -2,7 +2,8 @@
 applications:
   - name: notify-ftp
     buildpack: python_buildpack
-    no-route: true
+    routes:
+      - route: notify-ftp-{{ NOTIFY_ENVIRONMENT }}.cloudapps.digital
 
     memory: 2G
 
