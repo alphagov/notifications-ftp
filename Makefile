@@ -67,6 +67,8 @@ cf-login: ## Log in to Cloud Foundry
 check-env-vars: ## Check mandatory environment variables
 	$(if ${DEPLOY_ENV},,$(error Must specify DEPLOY_ENV))
 	$(if ${DNS_NAME},,$(error Must specify DNS_NAME))
+	$(if ${AWS_ACCESS_KEY_ID},,$(error Must specify AWS_ACCESS_KEY_ID))
+	$(if ${AWS_SECRET_ACCESS_KEY},,$(error Must specify AWS_SECRET_ACCESS_KEY))
 
 .PHONY: preview
 preview: ## Set environment to preview
@@ -134,13 +136,17 @@ clean-docker-containers: ## Clean up any remaining docker containers
 clean:
 	rm -rf cache target venv .coverage build tests/.cache wheelhouse
 
-.PHONY: build-paas-artifact
-build-paas-artifact: ## Build the deploy artifact for paas
+.PHONY: build-codedeploy-artifact build-paas-artifact
+build-codedeploy-artifact build-paas-artifact: ## Build the deploy artifact for paas and CodeDeploy
 	rm -rf target
 	mkdir -p target
 	zip -y -q -r -x@deploy-exclude.lst target/notifications-ftp.zip ./
 
-.PHONY: upload-paas-artifact ## Upload the deploy artifact for paas
-upload-paas-artifact: check-env-vars
+.PHONY: upload-codedeploy-artifact upload-paas-artifact ## Upload the deploy artifact for paas and CodeDeploy
+upload-codedeploy-artifact upload-paas-artifact: check-env-vars
 	$(if ${DEPLOY_BUILD_NUMBER},,$(error Must specify DEPLOY_BUILD_NUMBER))
 	aws s3 cp --region eu-west-1 --sse AES256 target/notifications-ftp.zip s3://${DNS_NAME}-codedeploy/notifications-ftp-${DEPLOY_BUILD_NUMBER}.zip
+
+.PHONY: deploy
+deploy: check-env-vars ## Trigger CodeDeploy for the api
+	aws deploy create-deployment --application-name notify-ftp --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name notify-ftp --s3-location bucket=${DNS_NAME}-codedeploy,key=notifications-ftp-${DEPLOY_BUILD_NUMBER}.zip,bundleType=zip --region eu-west-1
