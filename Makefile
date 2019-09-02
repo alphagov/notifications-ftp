@@ -145,7 +145,9 @@ build-codedeploy-artifact build-paas-artifact: ## Build the deploy artifact for 
 .PHONY: upload-codedeploy-artifact upload-paas-artifact ## Upload the deploy artifact for paas and CodeDeploy
 upload-codedeploy-artifact upload-paas-artifact: check-env-vars
 	$(if ${DEPLOY_BUILD_NUMBER},,$(error Must specify DEPLOY_BUILD_NUMBER))
+	$(if ${JENKINS_S3_BUCKET},,$(error Must specify JENKINS_S3_BUCKET))
 	aws s3 cp --region eu-west-1 --sse AES256 target/notifications-ftp.zip s3://${DNS_NAME}-codedeploy/notifications-ftp-${DEPLOY_BUILD_NUMBER}.zip
+	aws s3 cp --region eu-west-1 --sse AES256 target/notifications-ftp.zip s3://${JENKINS_S3_BUCKET}/build/notifications-ftp/${DEPLOY_BUILD_NUMBER}.zip
 
 .PHONY: deploy
 deploy: check-env-vars ## Trigger CodeDeploy for the api
