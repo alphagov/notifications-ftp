@@ -65,28 +65,24 @@ cf-login: ## Log in to Cloud Foundry
 
 .PHONY: check-env-vars
 check-env-vars: ## Check mandatory environment variables
-	$(if ${DEPLOY_ENV},,$(error Must specify DEPLOY_ENV))
 	$(if ${DNS_NAME},,$(error Must specify DNS_NAME))
 	$(if ${AWS_ACCESS_KEY_ID},,$(error Must specify AWS_ACCESS_KEY_ID))
 	$(if ${AWS_SECRET_ACCESS_KEY},,$(error Must specify AWS_SECRET_ACCESS_KEY))
 
 .PHONY: preview
 preview: ## Set environment to preview
-	$(eval export DEPLOY_ENV=preview)
 	$(eval export CF_SPACE=preview)
 	$(eval export DNS_NAME="notify.works")
 	@true
 
 .PHONY: staging
 staging: ## Set environment to staging
-	$(eval export DEPLOY_ENV=staging)
 	$(eval export CF_SPACE=staging)
 	$(eval export DNS_NAME="staging-notify.works")
 	@true
 
 .PHONY: production
 production: ## Set environment to production
-	$(eval export DEPLOY_ENV=production)
 	$(eval export CF_SPACE=production)
 	$(eval export DNS_NAME="notifications.service.gov.uk")
 	@true
@@ -148,7 +144,9 @@ upload-codedeploy-artifact: check-env-vars
 	aws s3 cp --region eu-west-1 --sse AES256 target/notifications-ftp.zip s3://${DNS_NAME}-codedeploy/notifications-ftp-${DEPLOY_BUILD_NUMBER}.zip
 
 .PHONY: upload-paas-artifact
-upload-paas-artifact: check-env-vars
+upload-paas-artifact:
+	$(if ${AWS_ACCESS_KEY_ID},,$(error Must specify AWS_ACCESS_KEY_ID))
+	$(if ${AWS_SECRET_ACCESS_KEY},,$(error Must specify AWS_SECRET_ACCESS_KEY))
 	$(if ${DEPLOY_BUILD_NUMBER},,$(error Must specify DEPLOY_BUILD_NUMBER))
 	$(if ${JENKINS_S3_BUCKET},,$(error Must specify JENKINS_S3_BUCKET))
 	aws s3 cp --region eu-west-1 --sse AES256 target/notifications-ftp.zip s3://${JENKINS_S3_BUCKET}/build/notifications-ftp/${DEPLOY_BUILD_NUMBER}.zip
