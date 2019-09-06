@@ -42,7 +42,8 @@ generate-manifest:
 	    <(${DECRYPT_CMD} ${NOTIFY_CREDENTIALS}/credentials/${CF_SPACE}/paas/ftp-environment-variables.gpg) 2>&1
 
 .PHONY: cf-target
-cf-target: check-env-vars
+cf-target:
+	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
 	@cf target -o ${CF_ORG} -s ${CF_SPACE}
 
 .PHONY: cf-deploy
