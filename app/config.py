@@ -92,7 +92,7 @@ class Preview(Config):
 
 
 class Staging(Config):
-    STATSD_ENABLED = True
+    STATSD_ENABLED = False
 
     DVLA_JOB_BUCKET_NAME = 'staging-dvla-file-per-job'
     DVLA_API_BUCKET_NAME = 'staging-dvla-letter-api-files'
@@ -101,7 +101,7 @@ class Staging(Config):
 
 
 class Production(Config):
-    STATSD_ENABLED = True
+    STATSD_ENABLED = False
 
     DVLA_JOB_BUCKET_NAME = 'production-dvla-file-per-job'
     DVLA_API_BUCKET_NAME = 'production-dvla-letter-api-files'
