@@ -1,0 +1,46 @@
+---
+applications:
+  - name: notify-ftp
+    buildpacks:
+    - python_buildpack
+
+    routes:
+      - route: notify-ftp-{{ NOTIFY_ENVIRONMENT }}.cloudapps.digital
+    services:
+      - logit-ssl-syslog-drain
+
+    processes:
+    - type: web
+      command: celery -A run_celery.notify_celery worker --loglevel=INFO --concurrency=1
+      health-check-type: process
+      memory: 2G
+
+    sidecars:
+      - name: aws-logs
+        process_types:
+          - web
+        command: >
+          touch /home/vcap/logs/gunicorn_error.log &&
+          touch /home/vcap/logs/app.log.json &&
+          aws configure set plugins.cwlogs cwlogs &&
+          aws logs push --region eu-west-1 --config-file awslogs.conf
+        memory: 64M
+
+    env:
+      NOTIFY_APP_NAME: notify-ftp
+      LOGGING_STDOUT_JSON: '1'
+
+      # Credentials variables
+      FTP_HOST: '{{ FTP_HOST }}'
+      FTP_USERNAME: '{{ FTP_USERNAME }}'
+      FTP_PASSWORD: '{{ FTP_PASSWORD }}'
+
+      NOTIFICATION_QUEUE_PREFIX: '{{ NOTIFICATION_QUEUE_PREFIX }}'
+      NOTIFY_ENVIRONMENT: '{{ NOTIFY_ENVIRONMENT }}'
+      NOTIFY_LOG_PATH: '/home/vcap/logs/app.log'
+
+
+      AWS_ACCESS_KEY_ID: '{{ AWS_ACCESS_KEY_ID }}'
+      AWS_SECRET_ACCESS_KEY: '{{ AWS_SECRET_ACCESS_KEY }}'
+
+      STATSD_PREFIX: '{{ STATSD_PREFIX }}'
