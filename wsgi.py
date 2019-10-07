@@ -2,7 +2,6 @@
 import os
 
 from flask import Flask
-from credstash import getAllSecrets
 
 from app import create_app
 
