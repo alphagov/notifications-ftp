@@ -115,4 +115,5 @@ configs = {
     'preview': Preview,
     'staging': Staging,
     'live': Production,
+    'production': Production,
 }

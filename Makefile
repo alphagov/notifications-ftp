@@ -21,6 +21,7 @@ BUILD_URL ?=
 DOCKER_CONTAINER_PREFIX = ${USER}-${BUILD_TAG}
 
 NOTIFY_CREDENTIALS ?= ~/.notify-credentials
+CF_API ?= api.cloud.service.gov.uk
 CF_APP = "notify-ftp"
 CF_ORG = "govuk-notify"
 
