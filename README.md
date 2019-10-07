@@ -25,6 +25,19 @@ mkvirtualenv -p /usr/local/bin/python3 notifications-ftp
 
 First, run `scripts/bootstrap.sh` to install dependencies.
 
+Create a local environment.sh file containing the following:
+
+```
+echo "
+export STATSD_PREFIX="stats-prefix"
+export NOTIFICATION_QUEUE_PREFIX="YOUR_OWN_PREFIX"
+export NOTIFY_ENVIRONMENT="development"
+export FTP_HOST="YOUR_IP_ADDRESS"
+export FTP_USERNAME="YOUR_LDAP_USERNAME"
+export FTP_PASSWORD="YOUR_LDAP_PASSWORD"
+"> environment.sh
+```
+
 You need to run the local celery instance. There is a flask app, however this is only used by ELB to keep the instances healthy.
 
 All you need to do is run the celery queue reader.
@@ -39,7 +52,7 @@ scripts/run_celery.sh
 Simply run
 
 ```
-make build test
+make test
 ```
 
 That will run flake8 for code analysis and our unit test suite.
