@@ -156,7 +156,7 @@ def test_zip_and_send_should_skip_if_record_already_in_zips_sent(mocks, caplog):
     # no update notification tasks should be triggered
     assert mocks.send_task.call_count == 0
     assert any(
-        rec.message == '2017-01-01/zips_sent/foo.zip.TXT already exists, skipping dvla upload'
+        rec.message == '2017-01-01/zips_sent/foo.zip.TXT already exists in S3, skipping DVLA upload'
         for rec in caplog.records
     )
 
