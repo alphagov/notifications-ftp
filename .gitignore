@@ -1,7 +1,5 @@
 test_results.xml
 
-version.py
-
 cache/*
 
 wheelhouse/*
