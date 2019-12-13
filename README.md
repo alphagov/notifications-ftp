@@ -1,10 +1,6 @@
 # notifications-ftp
-Notifications FTP Integrations
 
-Application that will handle Notify connecting to FTP based clients.
-
-Basic Flask/Celery python app.
-
+Celery app that sends letters from GOV.UK Notify to DVLA over FTP
 
 ## Setting Up
 
@@ -38,9 +34,7 @@ export FTP_PASSWORD="YOUR_LDAP_PASSWORD"
 "> environment.sh
 ```
 
-You need to run the local celery instance. There is a flask app, however this is only used by ELB to keep the instances healthy.
-
-All you need to do is run the celery queue reader.
+Then run the Celery app:
 
 ```
 scripts/run_celery.sh

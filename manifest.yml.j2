@@ -20,7 +20,6 @@ applications:
         process_types:
           - web
         command: >
-          touch /home/vcap/logs/gunicorn_error.log &&
           touch /home/vcap/logs/app.log.json &&
           aws configure set plugins.cwlogs cwlogs &&
           aws logs push --region eu-west-1 --config-file awslogs.conf
