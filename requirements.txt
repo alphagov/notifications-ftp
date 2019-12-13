@@ -1,5 +1,4 @@
 cffi==1.13.1
-gunicorn==19.9.0
 pyftpdlib==1.5.5
 pysftp==0.2.9
 credstash==1.15.0
