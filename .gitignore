@@ -1,13 +1,12 @@
 test_results.xml
 
-version.py
-
 cache/*
 
 wheelhouse/*
 
 # ignore local config
 environment.sh
+.envrc
 
 celerybeat-schedule
 
@@ -76,3 +75,6 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+# IDEs
+.vscode
