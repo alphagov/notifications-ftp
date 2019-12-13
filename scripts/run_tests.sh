@@ -30,5 +30,5 @@ fi
 flake8 .
 display_result $? 1 "Code style check"
 
-py.test --cov=app --cov-report=term-missing tests/ --junitxml=test_results.xml
+py.test
 display_result $? 2 "Unit tests"
