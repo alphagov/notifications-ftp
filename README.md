@@ -1,9 +1,6 @@
 # notifications-ftp
 
-Application that will handle Notify connecting to FTP based clients.
-
-Basic Celery python app.
-
+Celery app that sends letters from GOV.UK Notify to DVLA over FTP
 
 ## Setting Up
 
