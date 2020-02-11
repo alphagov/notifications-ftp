@@ -1,8 +1,6 @@
 pysftp==0.2.9
 Flask==1.1.1
 awscli-cwlogs>=1.4,<1.5
-celery==3.1.26.post2 # pyup: <4
+celery[sqs]==3.1.26.post2 # pyup: <4
 
 git+https://github.com/alphagov/notifications-utils.git@29.3.1#egg=notifications-utils==29.3.1
-
-git+https://github.com/alphagov/boto.git@2.43.0-patch3#egg=boto==2.43.0-patch3
