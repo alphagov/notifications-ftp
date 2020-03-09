@@ -4,9 +4,6 @@ from kombu import Exchange, Queue
 
 
 class Config(object):
-    # Hosted graphite statsd prefix
-    STATSD_PREFIX = os.getenv('STATSD_PREFIX')
-
     NOTIFICATION_QUEUE_PREFIX = os.getenv('NOTIFICATION_QUEUE_PREFIX')
 
     FTP_HOST = os.getenv('FTP_HOST')

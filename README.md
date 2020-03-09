@@ -25,7 +25,6 @@ Create a local environment.sh file containing the following:
 
 ```
 echo "
-export STATSD_PREFIX="stats-prefix"
 export NOTIFICATION_QUEUE_PREFIX="YOUR_OWN_PREFIX"
 export NOTIFY_ENVIRONMENT="development"
 export FTP_HOST="YOUR_IP_ADDRESS"
