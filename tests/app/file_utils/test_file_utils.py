@@ -56,7 +56,7 @@ def test_get_file_from_s3_in_memory_should_return_file_contents_on_successful_s3
 
     # use moto to mock out s3
     conn = boto3.resource('s3', region_name='eu-west-1')
-    conn.create_bucket(Bucket=bucket_name)
+    conn.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={'LocationConstraint': 'eu-west-1'})
     s3 = boto3.client('s3', region_name='eu-west-1')
     s3.put_object(Bucket=bucket_name, Key=filename, Body=b'\x00')
 
@@ -69,7 +69,7 @@ def test_get_file_from_s3_in_memory_should_return_file_contents_on_successful_s3
 @mock_s3
 def test_file_exists_on_s3(filename, expected):
     conn = boto3.resource('s3', region_name='eu-west-1')
-    conn.create_bucket(Bucket='bucket')
+    conn.create_bucket(Bucket='bucket', CreateBucketConfiguration={'LocationConstraint': 'eu-west-1'})
     s3 = boto3.client('s3', region_name='eu-west-1')
 
     s3.put_object(Bucket='bucket', Key='foo.txt', Body=b'\x00')
