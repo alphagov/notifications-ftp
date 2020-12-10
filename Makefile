@@ -11,6 +11,7 @@ DOCKER_CONTAINER_PREFIX = ${USER}-${BUILD_TAG}
 NOTIFY_CREDENTIALS ?= ~/.notify-credentials
 CF_APP = "notify-ftp"
 CF_ORG = "govuk-notify"
+CF_MANIFEST_PATH ?= /tmp/manifest.yml
 
 .PHONY: help
 help:
@@ -39,10 +40,15 @@ cf-deploy: cf-target ## Deploys the app to Cloud Foundry
 	$(if ${CF_SPACE},,$(error Must specify CF_SPACE))
 	@cf app --guid ${CF_APP} || exit 1
 	# cancel any existing deploys to ensure we can apply manifest (if a deploy is in progress you'll see ScaleDisabledDuringDeployment)
-	cf v3-cancel-zdt-push ${CF_APP} || true
+	cf cancel-deployment ${CF_APP} || true
 
-	cf v3-apply-manifest ${CF_APP} -f <(make -s generate-manifest)
-	cf v3-zdt-push ${CF_APP} --wait-for-deploy-complete  # fails after 5 mins if deploy doesn't work
+	# generate manifest (including secrets) and write it to CF_MANIFEST_PATH (in /tmp/)
+	make -s CF_APP=${CF_APP} generate-manifest > ${CF_MANIFEST_PATH}
+	# reads manifest from CF_MANIFEST_PATH
+	cf push ${CF_APP} --strategy=rolling -f ${CF_MANIFEST_PATH}
+	# delete old manifest file
+	rm ${CF_MANIFEST_PATH}
+
 
 .PHONY: preview
 preview: ## Set environment to preview
@@ -86,4 +92,4 @@ clean-docker-containers: ## Clean up any remaining docker containers
 
 .PHONY: clean
 clean:
-	rm -rf cache target venv .coverage build tests/.cache wheelhouse
+	rm -rf cache target venv .coverage build tests/.cache wheelhouse ${CF_MANIFEST_PATH}
