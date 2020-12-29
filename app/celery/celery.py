@@ -27,4 +27,4 @@ class NotifyCelery(Celery):
             task_cls=NotifyTask,
         )
 
-        self.conf.update(app.config)
+        self.conf.update(app.config['CELERY'])
