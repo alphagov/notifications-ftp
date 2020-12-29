@@ -26,5 +26,7 @@ if [ ! $VIRTUAL_ENV ]; then
 fi
 
 
+# install pycurl
+pip3 install -r requirements_dev.txt
 # Install Python development dependencies
 pip3 install -r requirements_for_test.txt

@@ -19,7 +19,8 @@ mkvirtualenv -p /usr/local/bin/python3 notifications-ftp
 
 ##  To run the application
 
-First, run `scripts/bootstrap.sh` to install dependencies.
+First, run `scripts/bootstrap.sh` to install dependencies. If you're install dependencies manually, you should run
+`pip install -r requirements_dev.txt` to install pycurl with openssl.
 
 Create a local environment.sh file containing the following:
 
@@ -39,6 +40,19 @@ Then run the Celery app:
 scripts/run_celery.sh
 ```
 
+### Troubleshooting
+
+If you see the following error when running the app locally, your pycurl library is not installed correctly. To fix this
+uninstall pycurl (`pip uninstall pycurl`), and then run `pip install -r requirements_dev.txt`.
+
+```
+[2020-12-29 12:04:55,333: CRITICAL/MainProcess] Unrecoverable error: ImportError('The curl client requires the pycurl library.',)
+Traceback (most recent call last):
+  File "/Users/leohemsted/.virtualenvs/ftp/lib/python3.6/site-packages/kombu/asynchronous/http/__init__.py", line 20, in get_client
+    return hub._current_http_client
+AttributeError: 'Hub' object has no attribute '_current_http_client'
+[...]
+```
 
 ##  To test the application
 
