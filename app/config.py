@@ -23,7 +23,6 @@ class Config(object):
     NOTIFY_LOG_PATH = os.getenv('NOTIFY_LOG_PATH', '/var/log/notify/application.log')
 
     CELERY = {
-        'accept_content': ['json'],
         'broker_url': 'sqs://',
         'broker_transport_options': {
             'region': AWS_REGION,
@@ -31,13 +30,11 @@ class Config(object):
             'visibility_timeout': 310,
             'queue_name_prefix': NOTIFICATION_QUEUE_PREFIX,
         },
-        'enable_utc': True,
         'timezone': 'Europe/London',
         'imports': ['app.celery.tasks'],
         'task_queues': [
             Queue('process-ftp-tasks', Exchange('default'), routing_key='process-ftp-tasks')
         ],
-        'task_serializer': 'json',
         # restart workers after each task is executed - this will help prevent any memory leaks (not that we should be
         # encouraging sloppy memory management). Since we only run a handful of tasks per day, and none are time
         # sensitive, the extra couple of seconds overhead isn't seen to be a huge issue.
