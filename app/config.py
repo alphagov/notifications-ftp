@@ -22,25 +22,24 @@ class Config(object):
     AWS_REGION = os.getenv('AWS_REGION', 'eu-west-1')
     NOTIFY_LOG_PATH = os.getenv('NOTIFY_LOG_PATH', '/var/log/notify/application.log')
 
-    BROKER_URL = 'sqs://'
-    BROKER_TRANSPORT_OPTIONS = {
-        'region': AWS_REGION,
-        'polling_interval': 1,
-        'visibility_timeout': 310,
-        'queue_name_prefix': NOTIFICATION_QUEUE_PREFIX
+    CELERY = {
+        'broker_url': 'sqs://',
+        'broker_transport_options': {
+            'region': AWS_REGION,
+            'polling_interval': 1,
+            'visibility_timeout': 310,
+            'queue_name_prefix': NOTIFICATION_QUEUE_PREFIX,
+        },
+        'timezone': 'Europe/London',
+        'imports': ['app.celery.tasks'],
+        'task_queues': [
+            Queue('process-ftp-tasks', Exchange('default'), routing_key='process-ftp-tasks')
+        ],
+        # restart workers after each task is executed - this will help prevent any memory leaks (not that we should be
+        # encouraging sloppy memory management). Since we only run a handful of tasks per day, and none are time
+        # sensitive, the extra couple of seconds overhead isn't seen to be a huge issue.
+        'worker_max_tasks_per_child': 1
     }
-    CELERY_ENABLE_UTC = True
-    CELERY_TIMEZONE = 'Europe/London'
-    CELERY_ACCEPT_CONTENT = ['json']
-    CELERY_TASK_SERIALIZER = 'json'
-    CELERY_IMPORTS = ('app.celery.tasks', )
-    CELERY_QUEUES = [
-        Queue('process-ftp-tasks', Exchange('default'), routing_key='process-ftp-tasks')
-    ]
-    # restart workers after each task is executed - this will help prevent any memory leaks (not that we should be
-    # encouraging sloppy memory management). Since we only run a handful of tasks per day, and none are time sensitive,
-    # the extra couple of seconds overhead isn't seen to be a huge issue.
-    CELERYD_MAX_TASKS_PER_CHILD = 1
 
     STATSD_ENABLED = False
     STATSD_HOST = "statsd.hostedgraphite.com"
