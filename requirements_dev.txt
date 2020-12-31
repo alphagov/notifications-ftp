@@ -1,3 +1,0 @@
-# this should be installed independently, since --global-option disables wheels for all other packages installed
-# with that pip command
-pycurl==7.43.0.6 --global-option="--with-openssl"
