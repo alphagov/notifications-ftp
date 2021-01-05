@@ -28,6 +28,7 @@ class Config(object):
             'region': AWS_REGION,
             'visibility_timeout': 310,
             'queue_name_prefix': NOTIFICATION_QUEUE_PREFIX,
+            'wait_time_seconds': 20,  # enable long polling, with a wait time of 20 seconds
         },
         'timezone': 'Europe/London',
         'imports': ['app.celery.tasks'],
