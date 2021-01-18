@@ -61,6 +61,8 @@ def upload_zip(sftp, zip_data, filename, statsd_client):
             ))
 
     with sftp.open('{}/{}'.format(sftp.pwd, filename), mode='w') as remote_file:
+        remote_file.set_pipelined()
+        zip_data = memoryview(zip_data.encode())
         remote_file.write(zip_data)
 
     statsd_client.timing("ftp-client.zip-upload-time", monotonic() - start_time)
