@@ -15,7 +15,7 @@ def mocks(client):
     class SendZipMocks:
         mock_bad_lstat = Mock(st_size=10)
         mock_lstat = Mock(st_size=1)
-        mock_remote_file = Mock(write=Mock(), __exit__=Mock(), __enter__=Mock())
+        mock_remote_file = Mock(write=Mock(), __exit__=Mock(return_value=False), __enter__=Mock())
         mock_data = b'\x00'
         mock_remote_filename = 'NOTIFY.20160101170000.ZIP'
     yield SendZipMocks
