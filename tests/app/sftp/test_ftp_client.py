@@ -22,7 +22,7 @@ def mocks(client):
 
 
 @freeze_time('2016-01-01T17:00:00')
-def test_send_zip_generates_remote_filename(mocks):
+def test_upload_zip_success(mocks):
     mock_zip_sftp = Mock(
         pwd='~/notify',
         exists=Mock(return_value=False),
@@ -35,6 +35,8 @@ def test_send_zip_generates_remote_filename(mocks):
 
     mock_zip_sftp.chdir.assert_called_once_with('notify')
     mock_zip_sftp.open.assert_called_once_with('~/notify/' + mocks.mock_remote_filename, mode='w')
+    mocks.mock_remote_file.__enter__.return_value.set_pipelined.assert_called_once()
+    mocks.mock_remote_file.__enter__.return_value.write.assert_called_once()
 
 
 @freeze_time('2016-01-01T17:00:00')
