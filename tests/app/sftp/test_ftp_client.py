@@ -15,14 +15,14 @@ def mocks(client):
     class SendZipMocks:
         mock_bad_lstat = Mock(st_size=10)
         mock_lstat = Mock(st_size=1)
-        mock_remote_file = Mock(write=Mock(), __exit__=Mock(), __enter__=Mock())
+        mock_remote_file = Mock(write=Mock(), __exit__=Mock(return_value=False), __enter__=Mock())
         mock_data = b'\x00'
         mock_remote_filename = 'NOTIFY.20160101170000.ZIP'
     yield SendZipMocks
 
 
 @freeze_time('2016-01-01T17:00:00')
-def test_send_zip_generates_remote_filename(mocks):
+def test_upload_zip_success(mocks):
     mock_zip_sftp = Mock(
         pwd='~/notify',
         exists=Mock(return_value=False),
@@ -35,6 +35,8 @@ def test_send_zip_generates_remote_filename(mocks):
 
     mock_zip_sftp.chdir.assert_called_once_with('notify')
     mock_zip_sftp.open.assert_called_once_with('~/notify/' + mocks.mock_remote_filename, mode='w')
+    mocks.mock_remote_file.__enter__.return_value.set_pipelined.assert_called_once()
+    mocks.mock_remote_file.__enter__.return_value.write.assert_called_once()
 
 
 @freeze_time('2016-01-01T17:00:00')
