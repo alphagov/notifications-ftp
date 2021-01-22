@@ -60,15 +60,24 @@ def upload_zip(sftp, zip_data, filename, statsd_client):
                 filename, stats.st_size
             ))
 
+    upload_start_time = monotonic()
+
     with sftp.open('{}/{}'.format(sftp.pwd, filename), mode='w') as remote_file:
         remote_file.set_pipelined()
         zip_data = memoryview(zip_data)
         remote_file.write(zip_data)
 
-    statsd_client.timing("ftp-client.zip-upload-time", monotonic() - start_time)
+    upload_duration = monotonic() - upload_start_time
+
+    current_app.logger.info("uploaded file {} of total size {} bytes in {} seconds".format(
+        filename, zip_data_len, upload_duration))
+
+    statsd_client.timing("ftp-client.zip-upload-time", upload_duration)
 
     check_file_exist_and_is_right_size(sftp, filename, zip_data_len)
+
     current_app.logger.info("Data {} uploaded to DVLA".format(filename))
+    current_app.logger.info("Total duration for {} {} seconds".format(filename, monotonic() - start_time))
 
 
 def check_file_exist_and_is_right_size(sftp, filename, zip_data_len):
