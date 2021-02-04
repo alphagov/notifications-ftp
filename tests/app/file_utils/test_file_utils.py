@@ -43,8 +43,8 @@ def test_get_zip_of_letter_pdfs_from_s3(notify_ftp, mocker):
 
     zipfile = ZipFile(BytesIO(zip_data))
 
-    assert zipfile.namelist()[0] == 'TEST1.PDF'
-    assert zipfile.namelist()[1] == 'TEST2.PDF'
+    assert 'TEST1.PDF' in zipfile.namelist()
+    assert 'TEST2.PDF' in zipfile.namelist()
     assert zipfile.read('TEST1.PDF') == b'\x00\x01'
     assert zipfile.read('TEST2.PDF') == b'\x00\x01'
 
