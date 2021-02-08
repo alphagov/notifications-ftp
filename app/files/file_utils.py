@@ -1,3 +1,4 @@
+import concurrent.futures
 from flask import current_app
 import boto3
 from botocore.exceptions import ClientError
@@ -9,10 +10,14 @@ def get_zip_of_letter_pdfs_from_s3(filenames):
     bucket_name = current_app.config['LETTERS_PDF_BUCKET_NAME']
     imz = InMemoryZip()
 
-    for i, filename in enumerate(filenames):
-        pdf_filename = filename.split('/')[-1]
-        pdf_file = _get_file_from_s3_in_memory(bucket_name, filename)
-        imz.append(pdf_filename, pdf_file)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        future_files_from_s3 = {
+            executor.submit(_get_file_from_s3_in_memory, bucket_name, filename): filename for filename in filenames
+        }
+        for completed_file in concurrent.futures.as_completed(future_files_from_s3):
+            filename = future_files_from_s3[completed_file]
+            pdf_filename = filename.split('/')[-1]
+            imz.append(pdf_filename, completed_file.result())
 
     return imz.read()
 
