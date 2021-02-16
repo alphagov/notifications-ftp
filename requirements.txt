@@ -1,7 +1,7 @@
 pysftp==0.2.9
 Flask==1.1.2
 awscli-cwlogs>=1.4,<1.5
-cryptography<3.4
+cryptography==3.4.5
 # nb: when bumping this, check to see if celery sqs deps have bumped here: https://github.com/celery/celery/blob/master/requirements/extras/sqs.txt
 # celery[sqs] pins pycurl to an old version so we are just installing sqs deps ourselves.
 celery==4.4.1
