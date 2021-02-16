@@ -6,6 +6,6 @@ cryptography==3.4.5
 # celery[sqs] pins pycurl to an old version so we are just installing sqs deps ourselves.
 celery==5.0.5
 pycurl==7.43.0.6
-boto3>=1.16,<1.17  # pin to minor version as patch versions update very frequently
+boto3==1.17.8  # pin to minor version as patch versions update very frequently
 
 git+https://github.com/alphagov/notifications-utils.git@43.5.4#egg=notifications-utils==43.5.4
