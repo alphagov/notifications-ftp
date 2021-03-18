@@ -1,13 +1,6 @@
 .DEFAULT_GOAL := help
 SHELL := /bin/bash
 
-DOCKER_IMAGE = govuknotify/notifications-ftp
-DOCKER_IMAGE_NAME = ${DOCKER_IMAGE}:master
-
-BUILD_TAG ?= notifications-ftp-manual
-
-DOCKER_CONTAINER_PREFIX = ${USER}-${BUILD_TAG}
-
 NOTIFY_CREDENTIALS ?= ~/.notify-credentials
 CF_APP = "notify-ftp"
 CF_ORG = "govuk-notify"
@@ -68,27 +61,6 @@ production: ## Set environment to production
 .PHONY: test
 test: ## run unit tests
 	./scripts/run_tests.sh
-
-.PHONY: prepare-docker-build-image
-prepare-docker-build-image: ## Prepare the Docker builder image
-	docker build -f docker/Dockerfile \
-		-t ${DOCKER_IMAGE_NAME} \
-		.
-
-define run_docker_container
-	docker run -it --rm \
-		--name "${DOCKER_CONTAINER_PREFIX}-${1}" \
-		${DOCKER_IMAGE_NAME} \
-		${2}
-endef
-
-.PHONY: test-with-docker
-test-with-docker: prepare-docker-build-image ## Run tests inside a Docker container
-	$(call run_docker_container,test, make test)
-
-.PHONY: clean-docker-containers
-clean-docker-containers: ## Clean up any remaining docker containers
-	docker rm -f $(shell docker ps -q -f "name=${DOCKER_CONTAINER_PREFIX}") 2> /dev/null || true
 
 .PHONY: clean
 clean:
