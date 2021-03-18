@@ -21,8 +21,8 @@ FOO_SUBFOLDER = '/tmp/dvla-file-storage/foo'
 
 def test_get_notification_references_from_s3():
     filenames = [
-        '2017-12-06/NOTIFY.ABC0000000000000.D.2.C.C.20171206184702.PDF',
-        '2017-12-06/NOTIFY.DEF0000000000000.D.2.C.C.20171206184710.PDF'
+        '2017-12-06/NOTIFY.ABC0000000000000.D.2.C.20171206184702.PDF',
+        '2017-12-06/NOTIFY.DEF0000000000000.ANYSUFFIX.PDF'
     ]
     refs = get_notification_references_from_s3_filenames(filenames)
 
