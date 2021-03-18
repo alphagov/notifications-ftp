@@ -98,3 +98,11 @@ make bootstrap
 
 make test
 ```
+
+## To run a local shell
+
+Although this app includes Flask, it's not possible to run `flask shell`. Run the following instead:
+
+```
+make shell
+```

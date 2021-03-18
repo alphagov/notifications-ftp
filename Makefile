@@ -21,8 +21,12 @@ run-celery: ## Runs celery worker
 		--concurrency=1
 
 .PHONY: test
-test: ## run unit tests
+test: ## Run unit tests
 	./scripts/run_tests.sh
+
+.PHONY: shell
+shell: ## Start a local shell with an app context
+	python -i -m run_celery
 
 .PHONY: help
 help:
