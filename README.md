@@ -10,21 +10,22 @@ To run the API you will need appropriate AWS credentials. See the [Wiki](https:/
 
 ### pycurl
 
-pycurl needs to be installed separately, with some specific compiler flags and steps. You'll need to follow these steps
-in any repo where you wish to run celery locally. The following steps have been adapted from https://gist.github.com/vidakDK/de86d751751b355ed3b26d69ecdbdb99
+`pycurl` needs to be installed separately, with some specific compiler flags and steps. The following steps have been adapted from https://gist.github.com/vidakDK/de86d751751b355ed3b26d69ecdbdb99
 
+First make sure you have some prerequisite dependencies installed:
 
-You'll need to run this once per machine you develop on.
 ```
 brew install curl openssl@1.1
-# add the new openssl and curl binaries to your path. Note: You may need to change these commands to write to your bashrc or bash_profile if you don't use zsh.
+
+# You may need to change these commands to write to your bashrc or bash_profile if you don't use zsh.
 echo 'export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"' >> ~/.zshrc
 echo 'export PATH="/usr/local/opt/curl/bin:$PATH"' >> ~/.zshrc
 
 source ~/.zshrc
 ```
 
-Then run the following command:
+Now install `pycurl` manually, with some specific compiler flags and steps.
+
 ```sh
 PYCURL_SSL_LIBRARY="openssl" \
 LDFLAGS="-L/usr/local/opt/curl/lib" \
@@ -32,14 +33,11 @@ CPPFLAGS="-I/usr/local/opt/curl/include" \
 pip install --ignore-installed pycurl==7.43.0.6 --global-option="--with-openssl" --global-option="--openssl-dir=/usr/local/opt/openssl@1.1"
 ```
 
-You can check if the install worked succesfully by running
-```sh
-python -c "import pycurl; print(pycurl.version)"
-```
+Check if the installation of `pycurl` worked succesfully by running:
 
-If the steps worked succesfully, you will see pycurl's version includes "OpenSSL/1.1.1i" or similar (rather than libressl)
-```
-PycURL/7.43.0.6 libcurl/7.74.0 (SecureTransport) OpenSSL/1.1.1i zlib/1.2.11 brotli/1.0.9 zstd/1.4.8 libidn2/2.3.0 libssh2/1.9.0 nghttp2/1.42.0 librtmp/2.3
+```sh
+# This should print a string containing "OpenSSL/1.1.1i" (versus "libressl")
+python -c "import pycurl; print(pycurl.version)"
 ```
 
 ### `environment.sh`
