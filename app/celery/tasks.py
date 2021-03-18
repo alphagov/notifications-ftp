@@ -1,17 +1,17 @@
 import json
-from flask import current_app
 
 from botocore.exceptions import ClientError
+from flask import current_app
 from notifications_utils.s3 import s3upload as utils_s3upload
 
-from app import notify_celery, ftp_client
+from app import ftp_client, notify_celery
 from app.files.file_utils import (
-    get_zip_of_letter_pdfs_from_s3,
+    file_exists_on_s3,
     get_notification_references_from_s3_filenames,
-    file_exists_on_s3
+    get_zip_of_letter_pdfs_from_s3,
 )
-from app.statsd_decorators import statsd
 from app.sftp.ftp_client import FtpException
+from app.statsd_decorators import statsd
 
 NOTIFY_QUEUE = 'notify-internal-tasks'
 

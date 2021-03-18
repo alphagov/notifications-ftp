@@ -1,7 +1,8 @@
 import concurrent.futures
-from flask import current_app
+
 import boto3
 from botocore.exceptions import ClientError
+from flask import current_app
 
 from app.files.in_memory_zip import InMemoryZip
 
