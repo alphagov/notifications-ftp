@@ -42,21 +42,29 @@ If the steps worked succesfully, you will see pycurl's version includes "OpenSSL
 PycURL/7.43.0.6 libcurl/7.74.0 (SecureTransport) OpenSSL/1.1.1i zlib/1.2.11 brotli/1.0.9 zstd/1.4.8 libidn2/2.3.0 libssh2/1.9.0 nghttp2/1.42.0 librtmp/2.3
 ```
 
-##  To run the application
+### `environment.sh`
 
-First, run `scripts/bootstrap.sh` to install dependencies.
-
-Create a local environment.sh file containing the following:
+Create and edit an environment.sh file.
 
 ```sh
 echo "
 export NOTIFICATION_QUEUE_PREFIX="YOUR_OWN_PREFIX"
 export NOTIFY_ENVIRONMENT="development"
-export FTP_HOST="YOUR_IP_ADDRESS"
+export FTP_HOST="localhost"
 export FTP_USERNAME="YOUR_LDAP_USERNAME"
 export FTP_PASSWORD="YOUR_LDAP_PASSWORD"
 "> environment.sh
 ```
+
+Things to change:
+
+- Replace `YOUR_OWN_PREFIX` with `local_dev_<first name>`.
+- Replace `YOUR_LDAP_USERNAME` with the one you use to sign in to your machine.
+- Replace `YOUR_LDAP_PASSWORD` with the one you use to sign in to your machine (yes really!).
+
+##  To run the application
+
+First, run `scripts/bootstrap.sh` to install dependencies.
 
 Then run the Celery app:
 
