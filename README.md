@@ -72,20 +72,6 @@ Then run the Celery app:
 scripts/run_celery.sh
 ```
 
-### Troubleshooting
-
-If you see the following error when running the app locally, your pycurl library is not installed correctly. To fix this
-follow the steps in the [pycurl section above](#pycurl).
-
-```
-[2020-12-29 12:04:55,333: CRITICAL/MainProcess] Unrecoverable error: ImportError('The curl client requires the pycurl library.',)
-Traceback (most recent call last):
-  File "/Users/leohemsted/.virtualenvs/ftp/lib/python3.6/site-packages/kombu/asynchronous/http/__init__.py", line 20, in get_client
-    return hub._current_http_client
-AttributeError: 'Hub' object has no attribute '_current_http_client'
-[...]
-```
-
 ##  To test the application
 
 Simply run
