@@ -6,6 +6,14 @@ CF_APP = "notify-ftp"
 CF_ORG = "govuk-notify"
 CF_MANIFEST_PATH ?= /tmp/manifest.yml
 
+.PHONY: run-celery
+run-celery: ## Runs celery worker
+	. environment.sh && celery \
+		-A run_celery.notify_celery worker \
+		--pidfile="/tmp/celery-ftp.pid" \
+		--loglevel=INFO \
+		--concurrency=1
+
 .PHONY: help
 help:
 	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
