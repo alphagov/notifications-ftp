@@ -10,12 +10,6 @@ To run the FTP application, you will need appropriate AWS credentials. You shoul
 
 Your aws credentials should be stored in a folder located at `~/.aws`. Follow [Amazon's instructions](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-config-files) for storing them correctly.
 
-### Virtualenv
-
-```sh
-mkvirtualenv -p /usr/local/bin/python3 notifications-ftp
-```
-
 ### pycurl
 
 pycurl needs to be installed separately, with some specific compiler flags and steps. You'll need to follow these steps
@@ -32,7 +26,7 @@ echo 'export PATH="/usr/local/opt/curl/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
-You'll need to then make sure your virtualenv is activated, and then run the following command
+Then run the following command:
 ```sh
 PYCURL_SSL_LIBRARY="openssl" \
 LDFLAGS="-L/usr/local/opt/curl/lib" \
