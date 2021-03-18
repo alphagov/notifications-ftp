@@ -49,8 +49,8 @@ echo "
 export NOTIFICATION_QUEUE_PREFIX="YOUR_OWN_PREFIX"
 export NOTIFY_ENVIRONMENT="development"
 export FTP_HOST="localhost"
-export FTP_USERNAME="YOUR_LDAP_USERNAME"
-export FTP_PASSWORD="YOUR_LDAP_PASSWORD"
+export FTP_USERNAME="YOUR_LDAP_USERNAME" # optional (if running the task)
+export FTP_PASSWORD="YOUR_LDAP_PASSWORD" # optional (if running the task)
 "> environment.sh
 ```
 
@@ -59,6 +59,27 @@ Things to change:
 - Replace `YOUR_OWN_PREFIX` with `local_dev_<first name>`.
 - Replace `YOUR_LDAP_USERNAME` with the one you use to sign in to your machine.
 - Replace `YOUR_LDAP_PASSWORD` with the one you use to sign in to your machine (yes really!).
+
+### FTP Server (optional)
+
+This app needs to connect to an FTP server. You can install one locally:
+
+```
+brew install pure-ftpd
+
+brew services start pure-ftpd
+```
+
+Since the SFTP client does something similar to `ssh localhost`, you also need to enable remote login:
+
+- Go to "System Preferences > Sharing"
+- Check the "Remote Login" service
+
+`pure-ftpd` will use your home directory as it's root. The code expects there to be a `notify` directory there, so you will need to create one (or adjust your FTP server settings to use an alternative root directory):
+
+```
+mkdir ~/notify
+```
 
 ##  To run the application
 
