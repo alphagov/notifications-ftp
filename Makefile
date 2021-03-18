@@ -6,6 +6,12 @@ CF_APP = "notify-ftp"
 CF_ORG = "govuk-notify"
 CF_MANIFEST_PATH ?= /tmp/manifest.yml
 
+.PHONY: bootstrap
+bootstrap: ## Install dependencies, etc.
+	echo "Checking pycurl version. Check ./README.md for installation steps."
+	python -c "import pycurl; print(pycurl.version)" | grep -i openssl
+	pip3 install -r requirements_for_test.txt
+
 .PHONY: run-celery
 run-celery: ## Runs celery worker
 	. environment.sh && celery \
@@ -13,6 +19,10 @@ run-celery: ## Runs celery worker
 		--pidfile="/tmp/celery-ftp.pid" \
 		--loglevel=INFO \
 		--concurrency=1
+
+.PHONY: test
+test: ## run unit tests
+	./scripts/run_tests.sh
 
 .PHONY: help
 help:
@@ -65,10 +75,6 @@ staging: ## Set environment to staging
 production: ## Set environment to production
 	$(eval export CF_SPACE=production)
 	@true
-
-.PHONY: test
-test: ## run unit tests
-	./scripts/run_tests.sh
 
 .PHONY: clean
 clean:

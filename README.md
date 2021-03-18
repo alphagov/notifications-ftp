@@ -64,20 +64,18 @@ Things to change:
 
 ##  To run the application
 
-First, run `scripts/bootstrap.sh` to install dependencies.
-
-Then run the Celery app:
-
 ```sh
-scripts/run_celery.sh
+# install dependencies, etc.
+make bootstrap
+
+make run-celery
 ```
 
 ##  To test the application
 
-Simply run
-
 ```sh
+# install dependencies, etc.
+make bootstrap
+
 make test
 ```
-
-That will run flake8 for code analysis and our unit test suite.
