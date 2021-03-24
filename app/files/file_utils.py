@@ -23,7 +23,7 @@ def get_zip_of_letter_pdfs_from_s3(filenames):
 
 
 def get_notification_references_from_s3_filenames(filenames):
-    # assumes S3 filename is like: 2017-12-06/NOTIFY.ABCDEFG1234567890.D.2.C.C.20171206184702.PDF
+    # assumes S3 filename is like: 2017-12-06/NOTIFY.ABCDEFG1234567890.SOME.SUFFIX.PDF
     return [f.split('.')[1] for f in filenames]
 
 
