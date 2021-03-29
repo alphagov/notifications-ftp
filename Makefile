@@ -1,17 +1,32 @@
 .DEFAULT_GOAL := help
 SHELL := /bin/bash
 
-DOCKER_IMAGE = govuknotify/notifications-ftp
-DOCKER_IMAGE_NAME = ${DOCKER_IMAGE}:master
-
-BUILD_TAG ?= notifications-ftp-manual
-
-DOCKER_CONTAINER_PREFIX = ${USER}-${BUILD_TAG}
-
 NOTIFY_CREDENTIALS ?= ~/.notify-credentials
 CF_APP = "notify-ftp"
 CF_ORG = "govuk-notify"
 CF_MANIFEST_PATH ?= /tmp/manifest.yml
+
+.PHONY: bootstrap
+bootstrap: ## Install dependencies, etc.
+	echo "Checking pycurl version. Check ./README.md for installation steps."
+	python -c "import pycurl; print(pycurl.version)" | grep -i openssl
+	pip3 install -r requirements_for_test.txt
+
+.PHONY: run-celery
+run-celery: ## Runs celery worker
+	. environment.sh && celery \
+		-A run_celery.notify_celery worker \
+		--pidfile="/tmp/celery-ftp.pid" \
+		--loglevel=INFO \
+		--concurrency=1
+
+.PHONY: test
+test: ## Run unit tests
+	./scripts/run_tests.sh
+
+.PHONY: shell
+shell: ## Start a local shell with an app context
+	python -i -m run_celery
 
 .PHONY: help
 help:
@@ -64,31 +79,6 @@ staging: ## Set environment to staging
 production: ## Set environment to production
 	$(eval export CF_SPACE=production)
 	@true
-
-.PHONY: test
-test: ## run unit tests
-	./scripts/run_tests.sh
-
-.PHONY: prepare-docker-build-image
-prepare-docker-build-image: ## Prepare the Docker builder image
-	docker build -f docker/Dockerfile \
-		-t ${DOCKER_IMAGE_NAME} \
-		.
-
-define run_docker_container
-	docker run -it --rm \
-		--name "${DOCKER_CONTAINER_PREFIX}-${1}" \
-		${DOCKER_IMAGE_NAME} \
-		${2}
-endef
-
-.PHONY: test-with-docker
-test-with-docker: prepare-docker-build-image ## Run tests inside a Docker container
-	$(call run_docker_container,test, make test)
-
-.PHONY: clean-docker-containers
-clean-docker-containers: ## Clean up any remaining docker containers
-	docker rm -f $(shell docker ps -q -f "name=${DOCKER_CONTAINER_PREFIX}") 2> /dev/null || true
 
 .PHONY: clean
 clean:

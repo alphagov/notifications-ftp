@@ -1,10 +1,11 @@
 import os
 
+from notifications_utils import logging
+from notifications_utils.clients.statsd.statsd_client import StatsdClient
+
 from app.celery.celery import NotifyCelery
 from app.sftp.ftp_client import FtpClient
 
-from notifications_utils import logging
-from notifications_utils.clients.statsd.statsd_client import StatsdClient
 notify_celery = NotifyCelery()
 statsd_client = StatsdClient()
 ftp_client = FtpClient()

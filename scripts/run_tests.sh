@@ -27,8 +27,12 @@ function display_result {
 if [[ -z "$VIRTUAL_ENV" ]] && [[ -d venv ]]; then
   source ./venv/bin/activate
 fi
+
 flake8 .
 display_result $? 1 "Code style check"
+
+isort --check-only ./app ./tests
+display_result $? 2 "Import order check"
 
 py.test
 display_result $? 2 "Unit tests"

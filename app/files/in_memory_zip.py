@@ -1,5 +1,5 @@
-from io import BytesIO
 import zipfile
+from io import BytesIO
 
 
 class InMemoryZip(object):

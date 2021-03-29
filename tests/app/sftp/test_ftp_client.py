@@ -4,8 +4,8 @@ import pytest
 from freezegun import freeze_time
 
 from app.sftp.ftp_client import (
-    check_file_exist_and_is_right_size,
     FtpException,
+    check_file_exist_and_is_right_size,
     upload_zip,
 )
 

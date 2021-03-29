@@ -2,19 +2,18 @@ from io import BytesIO
 from unittest.mock import call
 from zipfile import ZipFile
 
-import pytest
 import boto3
+import pytest
 from botocore.exceptions import ClientError
-from moto import mock_s3
 from flask import current_app
+from moto import mock_s3
 
 from app.files.file_utils import (
-    get_zip_of_letter_pdfs_from_s3,
     _get_file_from_s3_in_memory,
+    file_exists_on_s3,
     get_notification_references_from_s3_filenames,
-    file_exists_on_s3
+    get_zip_of_letter_pdfs_from_s3,
 )
-
 
 FOO_SUBFOLDER = '/tmp/dvla-file-storage/foo'
 

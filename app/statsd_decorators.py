@@ -1,8 +1,9 @@
 import functools
 
-from app import statsd_client
 from flask import current_app
 from monotonic import monotonic
+
+from app import statsd_client
 
 
 def statsd(namespace):
