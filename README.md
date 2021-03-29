@@ -58,7 +58,9 @@ Things to change:
 
 - Replace `YOUR_OWN_PREFIX` with `local_dev_<first name>`.
 - Replace `YOUR_LDAP_USERNAME` with the one you use to sign in to your machine.
-- Replace `YOUR_LDAP_PASSWORD` with the one you use to sign in to your machine (yes really!).
+- Replace `YOUR_LDAP_PASSWORD` with the one you use to sign in to your machine.\*
+
+\* _Storing your LDAP password unencrypted is far from ideal. We would like to improve this in the future._
 
 ### FTP Server (optional)
 
