@@ -38,6 +38,7 @@ applications:
       NOTIFY_ENVIRONMENT: '{{ NOTIFY_ENVIRONMENT }}'
       NOTIFY_LOG_PATH: '/home/vcap/logs/app.log'
 
+      STATSD_HOST: "notify-statsd-exporter-{{ environment }}.apps.internal"
 
       AWS_ACCESS_KEY_ID: '{{ AWS_ACCESS_KEY_ID }}'
       AWS_SECRET_ACCESS_KEY: '{{ AWS_SECRET_ACCESS_KEY }}'
