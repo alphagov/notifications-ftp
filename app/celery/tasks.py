@@ -11,13 +11,11 @@ from app.files.file_utils import (
     get_zip_of_letter_pdfs_from_s3,
 )
 from app.sftp.ftp_client import FtpException
-from app.statsd_decorators import statsd
 
 NOTIFY_QUEUE = 'notify-internal-tasks'
 
 
 @notify_celery.task(name="zip-and-send-letter-pdfs")
-@statsd(namespace="tasks")
 def zip_and_send_letter_pdfs(filenames_to_zip, upload_filename):
     folder_date = filenames_to_zip[0].split('/')[0]
     zips_sent_filename = '{}/zips_sent/{}.TXT'.format(folder_date, upload_filename)
