@@ -41,9 +41,9 @@ class Config(object):
         'worker_max_tasks_per_child': 20
     }
 
-    STATSD_ENABLED = False
-    STATSD_HOST = "statsd.hostedgraphite.com"
+    STATSD_HOST = os.getenv('STATSD_HOST')
     STATSD_PORT = 8125
+    STATSD_ENABLED = bool(STATSD_HOST)
 
     LOCAL_FILE_STORAGE_PATH = "~/dvla-file-storage"
 
@@ -70,7 +70,6 @@ class Development(Config):
 
 
 class Test(Development):
-    STATSD_ENABLED = False
     LOCAL_FILE_STORAGE_PATH = "/tmp/dvla-file-storage"
 
     DVLA_JOB_BUCKET_NAME = 'test-dvla-file-per-job'
@@ -80,7 +79,6 @@ class Test(Development):
 
 
 class Preview(Config):
-
     DVLA_JOB_BUCKET_NAME = 'preview-dvla-file-per-job'
     DVLA_API_BUCKET_NAME = 'preview-dvla-letter-api-files'
 
@@ -88,8 +86,6 @@ class Preview(Config):
 
 
 class Staging(Config):
-    STATSD_ENABLED = False
-
     DVLA_JOB_BUCKET_NAME = 'staging-dvla-file-per-job'
     DVLA_API_BUCKET_NAME = 'staging-dvla-letter-api-files'
 
@@ -97,8 +93,6 @@ class Staging(Config):
 
 
 class Production(Config):
-    STATSD_ENABLED = False
-
     DVLA_JOB_BUCKET_NAME = 'production-dvla-file-per-job'
     DVLA_API_BUCKET_NAME = 'production-dvla-letter-api-files'
 
