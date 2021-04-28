@@ -10,7 +10,7 @@ CF_MANIFEST_PATH ?= /tmp/manifest.yml
 bootstrap: ## Install dependencies, etc.
 	echo "Checking pycurl version. Check ./README.md for installation steps."
 	python -c "import pycurl; print(pycurl.version)" | grep -i openssl
-	pip3 install -r requirements_for_test.txt
+	pip install -r requirements_for_test.txt
 
 .PHONY: run-celery
 run-celery: ## Runs celery worker
