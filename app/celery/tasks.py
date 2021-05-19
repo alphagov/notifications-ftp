@@ -15,8 +15,8 @@ from app.sftp.ftp_client import FtpException
 NOTIFY_QUEUE = 'notify-internal-tasks'
 
 
-@notify_celery.task(name="zip-and-send-letter-pdfs")
-def zip_and_send_letter_pdfs(filenames_to_zip, upload_filename):
+@notify_celery.task(bind=True, name="zip-and-send-letter-pdfs", max_retries=5, default_retry_delay=300)
+def zip_and_send_letter_pdfs(self, filenames_to_zip, upload_filename):
     folder_date = filenames_to_zip[0].split('/')[0]
     zips_sent_filename = '{}/zips_sent/{}.TXT'.format(folder_date, upload_filename)
 
@@ -47,7 +47,8 @@ def zip_and_send_letter_pdfs(filenames_to_zip, upload_filename):
         )
     except ClientError:
         current_app.logger.exception('FTP app failed to download PDF from S3 bucket {}'.format(folder_date))
-        task_name = "update-letter-notifications-to-error"
+        self.retry(queue='process-ftp-tasks')
+        return
     except FtpException:
         try:
             # check if file exists with the right size.
@@ -55,8 +56,11 @@ def zip_and_send_letter_pdfs(filenames_to_zip, upload_filename):
             ftp_client.file_exists_with_correct_size(upload_filename, len(zip_data))
             task_name = "update-letter-notifications-to-sent"
         except FtpException:
-            current_app.logger.exception('FTP app failed to send api messages')
-            task_name = "update-letter-notifications-to-error"
+            current_app.logger.exception('Max retry failed: FTP app failed to send api messages')
+            self.retry(queue='process-ftp-tasks')
+            return
+    except self.MaxRetriesExceededError:
+        task_name = "update-letter-notifications-to-error"
     else:
         task_name = "update-letter-notifications-to-sent"
 
