@@ -31,7 +31,7 @@ def mocks(mocker, client):
             'app.celery.tasks.get_notification_references_from_s3_filenames',
             return_value=['1', '2', '3']
         )
-        zip_and_send_retry = mocker.patch('app.celery.tasks.zip_and_send_letter_pdfs.retry')
+        zip_and_send_retry = mocker.patch('app.celery.tasks.zip_and_send_letter_pdfs.retry', side_effect=Retry)
     with freeze_time('2017-01-01 17:30'):
         yield ZipAndSendLetterPDFsMocks
 
@@ -90,7 +90,6 @@ def test_zip_and_send_should_update_notifications_to_success(mocks):
 
 def test_zip_and_send_should_retry_if_s3_client_error(mocks):
     mocks.get_zip_of_letter_pdfs_from_s3.side_effect = ClientError({}, 'operation')
-    mocks.zip_and_send_retry.side_effect = Retry
     filenames = ['2017-01-01/TEST1.PDF']
     with pytest.raises(Retry):
         zip_and_send_letter_pdfs(filenames, 'foo.zip')
@@ -118,7 +117,6 @@ def test_zip_and_send_should_update_notification_if_max_retries_when_s3_client_e
 def test_zip_and_send_should_retry_if_send_zip_fails_and_files_did_not_upload(mocks):
     mocks.send_zip.side_effect = FtpException
     mocks.file_exists_with_correct_size.side_effect = FtpException
-    mocks.zip_and_send_retry.side_effect = Retry
 
     filenames = ['2017-01-01/TEST1.PDF']
     with pytest.raises(Retry):

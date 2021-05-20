@@ -21,11 +21,8 @@ def zip_and_send_letter_pdfs(self, filenames_to_zip, upload_filename):
     zips_sent_filename = '{}/zips_sent/{}.TXT'.format(folder_date, upload_filename)
 
     current_app.logger.info(
-        "Starting to zip {file_count} letter PDFs in memory from {folder} into dvla file {upload_filename}".format(  # noqa
-            file_count=len(filenames_to_zip),
-            folder=folder_date,
-            upload_filename=upload_filename
-        )
+        f"Starting to zip {len(filenames_to_zip)} letter PDFs in memory from "
+        f"{folder_date} into dvla file {upload_filename}"
     )
 
     try:
@@ -46,7 +43,8 @@ def zip_and_send_letter_pdfs(self, filenames_to_zip, upload_filename):
             file_location=zips_sent_filename
         )
     except ClientError:
-        current_app.logger.exception('FTP app failed to download PDF from S3 bucket {}'.format(folder_date))
+        current_app.logger.exception(
+            f'FTP app failed to download PDF from S3 bucket {folder_date} for zip file: {upload_filename}')
         self.retry(queue='process-ftp-tasks')
         return
     except FtpException:
@@ -56,10 +54,12 @@ def zip_and_send_letter_pdfs(self, filenames_to_zip, upload_filename):
             ftp_client.file_exists_with_correct_size(upload_filename, len(zip_data))
             task_name = "update-letter-notifications-to-sent"
         except FtpException:
-            current_app.logger.exception('Max retry failed: FTP app failed to send api messages')
+            current_app.logger.exception(f'FTP app failed to send letters for zip file: {upload_filename}')
             self.retry(queue='process-ftp-tasks')
             return
     except self.MaxRetriesExceededError:
+        current_app.logger.exception(
+            f'Max retry failed: FTP app failed to send letters for zip file: {upload_filename}')
         task_name = "update-letter-notifications-to-error"
     else:
         task_name = "update-letter-notifications-to-sent"
