@@ -83,3 +83,7 @@ production: ## Set environment to production
 .PHONY: clean
 clean:
 	rm -rf cache target venv .coverage build tests/.cache wheelhouse ${CF_MANIFEST_PATH}
+
+freeze-requirements: ## create static requirements.txt
+	pip install --upgrade pip-tools
+	pip-compile requirements.in
