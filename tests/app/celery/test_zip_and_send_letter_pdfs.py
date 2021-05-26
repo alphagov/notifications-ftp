@@ -2,6 +2,7 @@ from unittest.mock import call
 
 import pytest
 from botocore.exceptions import ClientError
+from celery.exceptions import MaxRetriesExceededError, Retry
 from flask import current_app
 from freezegun import freeze_time
 
@@ -30,7 +31,7 @@ def mocks(mocker, client):
             'app.celery.tasks.get_notification_references_from_s3_filenames',
             return_value=['1', '2', '3']
         )
-
+        zip_and_send_retry = mocker.patch('app.celery.tasks.zip_and_send_letter_pdfs.retry', side_effect=Retry)
     with freeze_time('2017-01-01 17:30'):
         yield ZipAndSendLetterPDFsMocks
 
@@ -87,32 +88,62 @@ def test_zip_and_send_should_update_notifications_to_success(mocks):
     )
 
 
-def test_zip_and_send_should_update_notifications_if_s3_client_error(mocks):
+def test_zip_and_send_should_retry_if_s3_client_error(mocks):
     mocks.get_zip_of_letter_pdfs_from_s3.side_effect = ClientError({}, 'operation')
-
     filenames = ['2017-01-01/TEST1.PDF']
-    zip_and_send_letter_pdfs(filenames, 'foo.zip')
+    with pytest.raises(Retry):
+        zip_and_send_letter_pdfs(filenames, 'foo.zip')
 
-    mocks.send_task.assert_called_once_with(
-        name='update-letter-notifications-to-error',
-        args=(['1', '2', '3'],),
-        queue='notify-internal-tasks'
-    )
+        mocks.zip_and_send_retry.assert_called_once_with(
+            filenames_to_zip=filenames,
+            upload_filename='foo.zip',
+            queue='process-ftp-tasks'
+        )
 
 
-def test_zip_and_send_should_update_notifications_to_error_if_send_zip_fails_and_files_did_not_upload(mocks):
+def test_zip_and_send_should_update_notification_if_max_retries_when_s3_client_error(mocks):
+    mocks.get_zip_of_letter_pdfs_from_s3.side_effect = ClientError({}, 'operation')
+    mocks.zip_and_send_retry.side_effect = MaxRetriesExceededError
+    filenames = ['2017-01-01/TEST1.PDF']
+    with pytest.raises(MaxRetriesExceededError):
+        zip_and_send_letter_pdfs(filenames, 'foo.zip')
+        mocks.send_task.assert_called_once_with(
+            name='update-letter-notifications-to-error',
+            args=(['1', '2', '3'],),
+            queue='notify-internal-tasks'
+        )
+
+
+def test_zip_and_send_should_retry_if_send_zip_fails_and_files_did_not_upload(mocks):
     mocks.send_zip.side_effect = FtpException
     mocks.file_exists_with_correct_size.side_effect = FtpException
 
     filenames = ['2017-01-01/TEST1.PDF']
-    zip_and_send_letter_pdfs(filenames, 'foo.zip')
+    with pytest.raises(Retry):
+        zip_and_send_letter_pdfs(filenames, 'foo.zip')
+        mocks.file_exists_with_correct_size.assert_called_once_with('foo.zip', 2)
+        mocks.zip_and_send_retry.assert_called_once_with(
+            filenames_to_zip=filenames,
+            upload_filename='foo.zip',
+            queue='process-ftp-tasks'
+        )
+        assert not mocks.send_task.called
 
-    mocks.file_exists_with_correct_size.assert_called_once_with('foo.zip', 2)
-    mocks.send_task.assert_called_once_with(
-        name='update-letter-notifications-to-error',
-        args=(['1', '2', '3'],),
-        queue='notify-internal-tasks'
-    )
+
+def test_zip_and_send_should_set_to_error_after_max_retries_after_files_did_not_upload(mocks):
+    mocks.send_zip.side_effect = FtpException
+    mocks.file_exists_with_correct_size.side_effect = FtpException
+    mocks.zip_and_send_retry.side_effect = MaxRetriesExceededError
+
+    filenames = ['2017-01-01/TEST1.PDF']
+    with pytest.raises(MaxRetriesExceededError):
+        zip_and_send_letter_pdfs(filenames, 'foo.zip')
+        mocks.file_exists_with_correct_size.assert_called_once_with('foo.zip', 2)
+        mocks.send_task.assert_called_once_with(
+            name='update-letter-notifications-to-error',
+            args=(['1', '2', '3'],),
+            queue='notify-internal-tasks'
+        )
 
 
 def test_zip_and_send_should_update_notifications_to_success_if_send_zip_fails_but_files_uploaded(mocks):
@@ -161,14 +192,30 @@ def test_zip_and_send_should_skip_if_record_already_in_zips_sent(mocks, caplog):
     )
 
 
-def test_zip_and_send_should_set_to_error_if_cant_check_zips_sent(mocks):
+def test_zip_and_send_should_retry_if_cant_check_zips_sent(mocks):
     mocks.file_exists_on_s3.side_effect = ClientError({}, 'operation')
+    mocks.zip_and_send_retry.side_effect = Retry
 
     filenames = ['2017-01-01/TEST1.PDF']
-    zip_and_send_letter_pdfs(filenames, 'foo.zip')
+    with pytest.raises(Retry):
+        zip_and_send_letter_pdfs(filenames, 'foo.zip')
+        mocks.zip_and_send_retry.assert_called_once_with(
+            filenames_to_zip=filenames,
+            upload_filename='foo.zip',
+            queue='process-ftp-tasks'
+        )
 
-    mocks.send_task.assert_called_once_with(
-        name='update-letter-notifications-to-error',
-        args=(['1', '2', '3'],),
-        queue='notify-internal-tasks'
-    )
+
+def test_zip_and_send_should_set_to_error_after_max_retries_if_cant_check_zips_sent(mocks):
+    mocks.file_exists_on_s3.side_effect = ClientError({}, 'operation')
+    mocks.zip_and_send_retry.side_effect = MaxRetriesExceededError
+
+    filenames = ['2017-01-01/TEST1.PDF']
+    with pytest.raises(MaxRetriesExceededError):
+        zip_and_send_letter_pdfs(filenames, 'foo.zip')
+
+        mocks.send_task.assert_called_once_with(
+            name='update-letter-notifications-to-error',
+            args=(['1', '2', '3'],),
+            queue='notify-internal-tasks'
+        )
