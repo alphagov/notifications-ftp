@@ -4,5 +4,5 @@ schedule: "every two weeks on tuesday"
 
 search: False
 requirements:
-  - requirements.txt
+  - requirements.in
   - requirements_for_test.txt
