@@ -79,7 +79,7 @@ govuk-bank-holidays==0.8
     # via notifications-utils
 idna==3.2
     # via requests
-importlib-metadata==4.0.1
+importlib-metadata==4.4.0
     # via kombu
 itsdangerous==2.0.1
     # via
