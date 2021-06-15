@@ -8,8 +8,6 @@ CF_MANIFEST_PATH ?= /tmp/manifest.yml
 
 .PHONY: bootstrap
 bootstrap: ## Install dependencies, etc.
-	echo "Checking pycurl version. Check ./README.md for installation steps."
-	python -c "import pycurl; print(pycurl.version)" | grep -i openssl
 	pip install -r requirements_for_test.txt
 
 .PHONY: run-celery
