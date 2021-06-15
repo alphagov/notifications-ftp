@@ -56,7 +56,7 @@ click==8.0.1
     #   click-plugins
     #   click-repl
     #   flask
-colorama==0.4.3
+colorama==0.4.4
     # via awscli
 cryptography==3.3.2
     # via
