@@ -6,7 +6,7 @@ Celery app that sends letters from GOV.UK Notify to DVLA over FTP
 
 ### AWS credentials
 
-To run the API you will need appropriate AWS credentials. See the [Wiki](https://github.com/alphagov/notifications-manuals/wiki/aws-accounts#how-to-set-up-local-development) for more details.
+To run the API you will need AWS credentials. See the [Wiki](https://github.com/alphagov/notifications-manuals/wiki/aws-accounts#how-to-set-up-local-development) for more details.
 
 ### pycurl
 
