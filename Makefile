@@ -20,7 +20,9 @@ run-celery: ## Runs celery worker
 
 .PHONY: test
 test: ## Run unit tests
-	./scripts/run_tests.sh
+	flake8 .
+	isort --check-only ./app ./tests
+	pytest
 
 .PHONY: shell
 shell: ## Start a local shell with an app context
