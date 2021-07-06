@@ -185,5 +185,5 @@ webencodings==0.5.1
     # via bleach
 werkzeug==2.0.1
     # via flask
-zipp==3.4.1
+zipp==3.5.0
     # via importlib-metadata
