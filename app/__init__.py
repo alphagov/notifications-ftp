@@ -21,6 +21,6 @@ def create_app(application):
     statsd_client.init_app(application)
     logging.init_app(application, statsd_client)
     notify_celery.init_app(application)
-    ftp_client.init_app(application, statsd_client)
+    ftp_client.init_app(application)
 
     return application
