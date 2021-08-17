@@ -16,7 +16,7 @@ bcrypt==3.2.0
     # via paramiko
 billiard==3.6.4.0
     # via celery
-bleach==3.3.0
+bleach==4.0.0
     # via notifications-utils
 boto3==1.18.22
     # via
