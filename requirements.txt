@@ -117,7 +117,7 @@ pyasn1==0.4.8
     # via rsa
 pycparser==2.20
     # via cffi
-pycurl==7.43.0.6
+pycurl==7.44.1
     # via -r requirements.in
 pynacl==1.4.0
     # via paramiko
