@@ -31,7 +31,7 @@ def test_upload_zip_success(mocks):
         lstat=Mock(return_value=mocks.mock_lstat),
     )
 
-    upload_zip(mock_zip_sftp, mocks.mock_data, mocks.mock_remote_filename, Mock())
+    upload_zip(mock_zip_sftp, mocks.mock_data, mocks.mock_remote_filename)
 
     mock_zip_sftp.chdir.assert_called_once_with('notify')
     mock_zip_sftp.open.assert_called_once_with('~/notify/' + mocks.mock_remote_filename, mode='w')
@@ -49,7 +49,7 @@ def test_send_zip_doesnt_overwrite_if_file_exists_with_same_size(mocks):
         lstat=Mock(return_value=mocks.mock_lstat),
     )
 
-    upload_zip(mock_zip_sftp, mocks.mock_data, mocks.mock_remote_filename, Mock())
+    upload_zip(mock_zip_sftp, mocks.mock_data, mocks.mock_remote_filename)
 
     assert mock_zip_sftp.open.called is False
 
@@ -65,7 +65,7 @@ def test_send_zip_overwrites_if_file_exists_with_different_size(mocks):
         lstat=Mock(side_effect=[mocks.mock_bad_lstat, mocks.mock_lstat]),
     )
 
-    upload_zip(mock_zip_sftp, mocks.mock_data, mocks.mock_remote_filename, Mock())
+    upload_zip(mock_zip_sftp, mocks.mock_data, mocks.mock_remote_filename)
 
     mock_zip_sftp.open.assert_called_once_with('~/notify/' + mocks.mock_remote_filename, mode='w')
 
@@ -80,7 +80,7 @@ def test_send_zip_errors_if_file_wasnt_put_on(mocks):
     )
 
     with pytest.raises(FtpException):
-        upload_zip(mock_zip_sftp, mocks.mock_data, mocks.mock_remote_filename, Mock())
+        upload_zip(mock_zip_sftp, mocks.mock_data, mocks.mock_remote_filename)
 
 
 @freeze_time('2016-01-01T17:00:00')
@@ -94,7 +94,7 @@ def test_send_zip_errors_if_remote_file_size_is_different(mocks):
     )
 
     with pytest.raises(FtpException):
-        upload_zip(mock_zip_sftp, mocks.mock_data, mocks.mock_remote_filename, Mock())
+        upload_zip(mock_zip_sftp, mocks.mock_data, mocks.mock_remote_filename)
 
 
 def test_file_exists_with_correct_size(mocks):

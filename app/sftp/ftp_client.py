@@ -12,11 +12,10 @@ class FtpException(Exception):
 
 
 class FtpClient():
-    def init_app(self, app, statsd_client):
+    def init_app(self, app):
         self.host = app.config.get('FTP_HOST')
         self.username = app.config.get('FTP_USERNAME')
         self.password = app.config.get('FTP_PASSWORD')
-        self.statsd_client = statsd_client
 
     @contextmanager
     def _sftp(self):
@@ -33,14 +32,14 @@ class FtpClient():
 
     def send_zip(self, zip_data, filename):
         with self._sftp() as sftp:
-            upload_zip(sftp, zip_data, filename, self.statsd_client)
+            upload_zip(sftp, zip_data, filename)
 
     def file_exists_with_correct_size(self, filename, zip_data_len):
         with self._sftp() as sftp:
             check_file_exist_and_is_right_size(sftp, filename, zip_data_len)
 
 
-def upload_zip(sftp, zip_data, filename, statsd_client):
+def upload_zip(sftp, zip_data, filename):
     sftp.chdir(NOTIFY_SUBFOLDER)
     zip_data_len = len(zip_data)
 
@@ -71,8 +70,6 @@ def upload_zip(sftp, zip_data, filename, statsd_client):
 
     current_app.logger.info("uploaded file {} of total size {} bytes in {} seconds".format(
         filename, zip_data_len, upload_duration))
-
-    statsd_client.timing("ftp-client.zip-upload-time", upload_duration)
 
     check_file_exist_and_is_right_size(sftp, filename, zip_data_len)
 
