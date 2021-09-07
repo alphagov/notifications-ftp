@@ -4,5 +4,5 @@ freezegun==1.1.0
 isort==5.9.3
 moto==2.2.6
 pytest-env==0.6.2
-pytest-mock==3.6.0
+pytest-mock==3.6.1
 pytest==6.2.3
