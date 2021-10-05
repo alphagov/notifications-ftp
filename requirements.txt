@@ -6,7 +6,7 @@
 #
 amqp==5.0.6
     # via kombu
-awscli==1.19.80
+awscli==1.20.54
     # via
     #   awscli-cwlogs
     #   notifications-utils
