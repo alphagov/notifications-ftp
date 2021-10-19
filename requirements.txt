@@ -50,7 +50,7 @@ click==8.0.3
     #   click-plugins
     #   click-repl
     #   flask
-click-didyoumean==0.0.3
+click-didyoumean==0.3.0
     # via celery
 click-plugins==1.1.1
     # via celery
