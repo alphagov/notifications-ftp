@@ -111,7 +111,7 @@ paramiko==2.8.0
     # via pysftp
 phonenumbers==8.12.35
     # via notifications-utils
-prompt-toolkit==3.0.18
+prompt-toolkit==3.0.20
     # via click-repl
 pyasn1==0.4.8
     # via rsa
