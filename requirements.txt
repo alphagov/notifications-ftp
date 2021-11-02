@@ -60,7 +60,7 @@ cryptography==35.0.0
     # via
     #   -r requirements.in
     #   paramiko
-docutils==0.15.2
+docutils==0.18
     # via awscli
 flask==2.0.2
     # via
