@@ -10,35 +10,7 @@ To run the API you will need appropriate AWS credentials. See the [Wiki](https:/
 
 ### pycurl
 
-`pycurl` needs to be installed separately, with some specific compiler flags and steps. The following steps have been adapted from https://gist.github.com/vidakDK/de86d751751b355ed3b26d69ecdbdb99
-
-First make sure you have some prerequisite dependencies installed:
-
-```
-brew install curl openssl@1.1
-
-# You may need to change these commands to write to your bashrc or bash_profile if you don't use zsh.
-echo 'export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"' >> ~/.zshrc
-echo 'export PATH="/usr/local/opt/curl/bin:$PATH"' >> ~/.zshrc
-
-source ~/.zshrc
-```
-
-Now install `pycurl` manually, with some specific compiler flags and steps.
-
-```sh
-PYCURL_SSL_LIBRARY="openssl" \
-LDFLAGS="-L/usr/local/opt/curl/lib" \
-CPPFLAGS="-I/usr/local/opt/curl/include" \
-pip install --ignore-installed pycurl==7.43.0.6 --global-option="--with-openssl" --global-option="--openssl-dir=/usr/local/opt/openssl@1.1"
-```
-
-Check if the installation of `pycurl` worked succesfully by running:
-
-```sh
-# This should print a string containing "OpenSSL/1.1.1i" (versus "libressl")
-python -c "import pycurl; print(pycurl.version)"
-```
+See https://github.com/alphagov/notifications-manuals/wiki/Getting-started#pycurl
 
 ### `environment.sh`
 
