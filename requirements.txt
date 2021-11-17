@@ -16,7 +16,7 @@ bcrypt==3.2.0
     # via paramiko
 billiard==3.6.4.0
     # via celery
-bleach==3.3.0
+bleach==4.1.0
     # via notifications-utils
 boto3==1.17.63
     # via
@@ -93,9 +93,7 @@ markupsafe==2.0.1
     # via jinja2
 mistune==0.8.4
     # via notifications-utils
-monotonic==1.6
-    # via notifications-utils
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@43.5.4
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@48.1.0
     # via -r requirements.in
 orderedset==2.0.3
     # via notifications-utils
@@ -148,6 +146,8 @@ s3transfer==0.4.2
     # via
     #   awscli
     #   boto3
+shapely==1.8.0
+    # via notifications-utils
 six==1.16.0
     # via
     #   awscli-cwlogs

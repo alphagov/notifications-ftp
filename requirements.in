@@ -13,4 +13,4 @@ cryptography==3.3.2 # pyup: <3.4
 # celery[sqs] pins pycurl to an old version so we are just installing sqs deps ourselves.
 celery==5.0.5
 
-git+https://github.com/alphagov/notifications-utils.git@43.5.4#egg=notifications-utils==43.5.4
+git+https://github.com/alphagov/notifications-utils.git@48.1.0#egg=notifications-utils==48.1.0
