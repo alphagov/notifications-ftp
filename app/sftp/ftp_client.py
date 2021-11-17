@@ -1,8 +1,8 @@
+import time
 from contextlib import contextmanager
 
 import pysftp
 from flask import current_app
-from monotonic import monotonic
 
 NOTIFY_SUBFOLDER = 'notify'
 
@@ -45,7 +45,7 @@ def upload_zip(sftp, zip_data, filename):
 
     current_app.logger.info("uploading zip {} of total size {:,}".format(filename, zip_data_len))
 
-    start_time = monotonic()
+    start_time = time.monotonic()
 
     if sftp.exists('{}/{}'.format(sftp.pwd, filename)):
         stats = sftp.lstat('{}/{}'.format(sftp.pwd, filename))
@@ -59,14 +59,14 @@ def upload_zip(sftp, zip_data, filename):
                 filename, stats.st_size
             ))
 
-    upload_start_time = monotonic()
+    upload_start_time = time.monotonic()
 
     with sftp.open('{}/{}'.format(sftp.pwd, filename), mode='w') as remote_file:
         remote_file.set_pipelined()
         zip_data = memoryview(zip_data)
         remote_file.write(zip_data)
 
-    upload_duration = monotonic() - upload_start_time
+    upload_duration = time.monotonic() - upload_start_time
 
     current_app.logger.info("uploaded file {} of total size {} bytes in {} seconds".format(
         filename, zip_data_len, upload_duration))
@@ -74,7 +74,7 @@ def upload_zip(sftp, zip_data, filename):
     check_file_exist_and_is_right_size(sftp, filename, zip_data_len)
 
     current_app.logger.info("Data {} uploaded to DVLA".format(filename))
-    current_app.logger.info("Total duration for {} {} seconds".format(filename, monotonic() - start_time))
+    current_app.logger.info("Total duration for {} {} seconds".format(filename, time.monotonic() - start_time))
 
 
 def check_file_exist_and_is_right_size(sftp, filename, zip_data_len):
