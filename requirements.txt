@@ -32,7 +32,9 @@ cachetools==4.2.2
 celery==5.0.5
     # via -r requirements.in
 certifi==2020.12.5
-    # via requests
+    # via
+    #   pyproj
+    #   requests
 cffi==1.14.5
     # via
     #   bcrypt
@@ -93,7 +95,7 @@ markupsafe==2.0.1
     # via jinja2
 mistune==0.8.4
     # via notifications-utils
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@48.1.0
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@49.0.0
     # via -r requirements.in
 orderedset==2.0.3
     # via notifications-utils
@@ -116,6 +118,8 @@ pynacl==1.4.0
 pyparsing==2.4.7
     # via packaging
 pypdf2==1.26.0
+    # via notifications-utils
+pyproj==3.2.1
     # via notifications-utils
 pysftp==0.2.9
     # via -r requirements.in
