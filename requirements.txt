@@ -144,7 +144,7 @@ requests==2.26.0
     #   awscli-cwlogs
     #   govuk-bank-holidays
     #   notifications-utils
-rsa==4.7.2
+rsa==4.8
     # via awscli
 s3transfer==0.4.2
     # via
