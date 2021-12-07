@@ -75,7 +75,7 @@ geojson==2.5.0
     # via notifications-utils
 govuk-bank-holidays==0.8
     # via notifications-utils
-idna==2.10
+idna==3.3
     # via requests
 itsdangerous==2.0.1
     # via
