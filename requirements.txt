@@ -109,7 +109,7 @@ prompt-toolkit==3.0.23
     # via click-repl
 pyasn1==0.4.8
     # via rsa
-pycparser==2.20
+pycparser==2.21
     # via cffi
 pycurl==7.44.1
     # via -r requirements.in
