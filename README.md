@@ -81,6 +81,6 @@ Although this app includes Flask, it's not possible to run `flask shell`. Run th
 make shell
 ```
 
-## To update application dependencies
+## Further documentation
 
-`requirements.txt` is generated from the `requirements.in` in order to pin versions of all nested dependencies. If `requirements.in` has been changed, run `make freeze-requirements` to regenerate it.
+- [Updating dependencies](https://github.com/alphagov/notifications-manuals/wiki/Dependencies)
