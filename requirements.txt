@@ -27,7 +27,7 @@ botocore==1.23.37
     #   awscli
     #   boto3
     #   s3transfer
-cachetools==4.2.2
+cachetools==5.0.0
     # via notifications-utils
 celery==5.2.3
     # via -r requirements.in
