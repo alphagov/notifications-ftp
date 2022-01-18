@@ -2,7 +2,7 @@ pysftp==0.2.9
 Flask==2.0.2
 awscli-cwlogs>=1.4,<1.5
 pycurl==7.44.1
-boto3==1.17.63
+boto3==1.20.37
 click<8.0,>=7.0
 
 # higher version causes build to fail on PaaS due to lack of Rust
