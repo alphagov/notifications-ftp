@@ -59,9 +59,7 @@ click-repl==0.1.6
 colorama==0.4.3
     # via awscli
 cryptography==3.3.2
-    # via
-    #   -r requirements.in
-    #   paramiko
+    # via paramiko
 docutils==0.15.2
     # via awscli
 flask==1.1.2
