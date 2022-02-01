@@ -62,7 +62,7 @@ cryptography==3.3.2
     # via paramiko
 docutils==0.15.2
     # via awscli
-flask==1.1.2
+flask==2.0.2
     # via
     #   -r requirements.in
     #   flask-redis
