@@ -5,4 +5,4 @@ isort==5.10.1
 moto==3.0.2
 pytest-env==0.6.2
 pytest-mock==3.7.0
-pytest==6.2.3
+pytest==6.2.5
