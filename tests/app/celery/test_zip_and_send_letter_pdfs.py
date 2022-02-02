@@ -2,7 +2,11 @@ from unittest.mock import call
 
 import pytest
 from botocore.exceptions import ClientError
-from celery.exceptions import MaxRetriesExceededError, Retry
+from celery.exceptions import (
+    MaxRetriesExceededError,
+    Retry,
+    SoftTimeLimitExceeded,
+)
 from flask import current_app
 from freezegun import freeze_time
 
@@ -200,6 +204,32 @@ def test_zip_and_send_should_retry_if_cant_check_zips_sent(mocks):
 
 def test_zip_and_send_should_set_to_error_after_max_retries_if_cant_check_zips_sent(mocks):
     mocks.file_exists_on_s3.side_effect = ClientError({}, 'operation')
+    mocks.zip_and_send_retry.side_effect = MaxRetriesExceededError
+
+    filenames = ['2017-01-01/TEST1.PDF']
+
+    zip_and_send_letter_pdfs(filenames, 'foo.zip')
+
+    mocks.send_task.assert_called_once_with(
+        name='update-letter-notifications-to-error',
+        args=(['1', '2', '3'],),
+        queue='notify-internal-tasks'
+    )
+
+
+def test_zip_and_send_should_retry_if_celery_hits_soft_time_limit(mocks):
+    mocks.file_exists_on_s3.side_effect = SoftTimeLimitExceeded
+    mocks.zip_and_send_retry.side_effect = Retry
+
+    filenames = ['2017-01-01/TEST1.PDF']
+    with pytest.raises(Retry):
+        zip_and_send_letter_pdfs(filenames, 'foo.zip')
+
+    mocks.zip_and_send_retry.assert_called_once_with(queue='process-ftp-tasks')
+
+
+def test_zip_and_send_should_set_to_error_after_max_retries_if_celery_hits_soft_time_limit(mocks):
+    mocks.file_exists_on_s3.side_effect = SoftTimeLimitExceeded
     mocks.zip_and_send_retry.side_effect = MaxRetriesExceededError
 
     filenames = ['2017-01-01/TEST1.PDF']
