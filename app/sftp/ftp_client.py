@@ -24,6 +24,7 @@ class FtpClient():
             cnopts.hostkeys = None
             current_app.logger.info("opening connection to {}".format(self.host))
             with pysftp.Connection(self.host, username=self.username, password=self.password, cnopts=cnopts) as sftp:
+                sftp.timeout = 30
                 yield sftp
         except Exception as e:
             # reraise all exceptions as FtpException to ensure we can handle them down the line

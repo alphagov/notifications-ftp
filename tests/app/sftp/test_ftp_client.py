@@ -122,7 +122,8 @@ def test_file_exists_with_correct_size_throws_exception_when_file_does_not_exist
 
     with pytest.raises(expected_exception=FtpException) as e:
         check_file_exist_and_is_right_size(mock_sftp, remote_filename, len(zip_data))
-        assert e.value == "Zip file {} not uploaded".format(remote_filename)
+
+    assert str(e.value) == "Zip file file_does_not_exist_remotely.zip not uploaded"
     mock_sftp.listdir.assert_called_once_with()
 
 
@@ -133,11 +134,14 @@ def test_file_exists_with_correct_size_throws_exception_file_exists_with_wrong_s
         pwd='~/notify',
         exists=Mock(return_value=False),
         listdir=Mock(return_value=[remote_filename]),
-        lstat=Mock(st_size=1)
+        lstat=Mock(return_value=Mock(st_size=1))
     )
 
     with pytest.raises(expected_exception=FtpException) as e:
         check_file_exist_and_is_right_size(mock_sftp, remote_filename, len(zip_data))
-        assert e.value == "Zip file {} uploaded but size is incorrect: is {}, expected {}d".format(
-            remote_filename, len(zip_data), 1)
-    mock_sftp.lstat.assert_called_once_with('~/notify/{}'.format(remote_filename))
+
+    assert str(e.value) == (
+        "Zip file file_does_not_exist_remotely.zip uploaded but size is incorrect: "
+        "is 1, expected 9"
+    )
+    mock_sftp.lstat.assert_called_once_with('~/notify/file_does_not_exist_remotely.zip')
