@@ -71,7 +71,7 @@ flask-redis==0.4.0
     # via notifications-utils
 geojson==2.5.0
     # via notifications-utils
-govuk-bank-holidays==0.8
+govuk-bank-holidays==0.11
     # via notifications-utils
 idna==2.10
     # via requests
