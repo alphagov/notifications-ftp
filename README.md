@@ -4,13 +4,11 @@ Celery app that sends letters from GOV.UK Notify to DVLA over FTP
 
 ## Setting Up
 
+**Running the app locally is currently broken on some machines, so you can skip all of the following steps. See https://github.com/alphagov/notifications-ftp/issues/367**
+
 ### AWS credentials
 
 To run the API you will need appropriate AWS credentials. See the [Wiki](https://github.com/alphagov/notifications-manuals/wiki/aws-accounts#how-to-set-up-local-development) for more details.
-
-### pycurl
-
-See https://github.com/alphagov/notifications-manuals/wiki/Getting-started#pycurl
 
 ### `environment.sh`
 
@@ -63,6 +61,8 @@ make bootstrap
 
 make run-celery
 ```
+
+**This is currently broken on some machines. See https://github.com/alphagov/notifications-ftp/issues/367**
 
 ##  To test the application
 
