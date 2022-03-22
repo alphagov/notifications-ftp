@@ -58,7 +58,7 @@ click-repl==0.1.6
     # via celery
 colorama==0.4.3
     # via awscli
-cryptography==3.3.2
+cryptography==3.4.8
     # via paramiko
 docutils==0.15.2
     # via awscli
@@ -156,7 +156,6 @@ six==1.16.0
     #   bcrypt
     #   bleach
     #   click-repl
-    #   cryptography
     #   govuk-bank-holidays
     #   pynacl
     #   python-dateutil
