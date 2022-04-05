@@ -3,7 +3,7 @@ Flask==2.1.1
 awscli-cwlogs>=1.4,<1.5
 pycurl==7.45.1
 boto3==1.21.33
-click<8.0,>=7.0
+click==8.1.2
 
 # nb: when bumping this, check to see if celery sqs deps have bumped here: https://github.com/celery/celery/blob/master/requirements/extras/sqs.txt
 # celery[sqs] pins pycurl to an old version so we are just installing sqs deps ourselves.
