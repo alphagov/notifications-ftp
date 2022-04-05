@@ -1,6 +1,6 @@
 -r requirements.txt
 flake8==4.0.1
-freezegun==1.1.0
+freezegun==1.2.1
 isort==5.8.0
 moto==2.0.6
 pytest-env==0.6.2
