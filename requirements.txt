@@ -42,7 +42,7 @@ cffi==1.15.0
     #   pynacl
 chardet==4.0.0
     # via requests
-click==7.1.2
+click==8.1.2
     # via
     #   -r requirements.in
     #   celery
