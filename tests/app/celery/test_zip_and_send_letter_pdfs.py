@@ -8,7 +8,6 @@ from celery.exceptions import (
     SoftTimeLimitExceeded,
 )
 from flask import current_app
-from freezegun import freeze_time
 
 from app.celery.tasks import zip_and_send_letter_pdfs
 from app.sftp.ftp_client import FtpException
@@ -36,8 +35,8 @@ def mocks(mocker, client):
             return_value=['1', '2', '3']
         )
         zip_and_send_retry = mocker.patch('app.celery.tasks.zip_and_send_letter_pdfs.retry', side_effect=Retry)
-    with freeze_time('2017-01-01 17:30'):
-        yield ZipAndSendLetterPDFsMocks
+
+    yield ZipAndSendLetterPDFsMocks
 
 
 def test_should_get_zip_of_letter_pdfs_from_s3(mocks):
