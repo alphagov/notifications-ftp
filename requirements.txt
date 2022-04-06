@@ -71,7 +71,7 @@ flask-redis==0.4.0
     # via notifications-utils
 geojson==2.5.0
     # via notifications-utils
-govuk-bank-holidays==0.8
+govuk-bank-holidays==0.11
     # via notifications-utils
 idna==2.10
     # via requests
@@ -93,7 +93,7 @@ markupsafe==2.0.1
     # via jinja2
 mistune==0.8.4
     # via notifications-utils
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@51.3.0
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@55.1.2
     # via -r requirements.in
 orderedset==2.0.3
     # via notifications-utils
@@ -156,7 +156,6 @@ six==1.16.0
     #   bcrypt
     #   bleach
     #   click-repl
-    #   govuk-bank-holidays
     #   pynacl
     #   python-dateutil
 smartypants==2.0.1

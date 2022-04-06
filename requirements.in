@@ -9,4 +9,4 @@ click<8.0,>=7.0
 # celery[sqs] pins pycurl to an old version so we are just installing sqs deps ourselves.
 celery==5.0.5
 
-git+https://github.com/alphagov/notifications-utils.git@51.3.0#egg=notifications-utils==51.3.0
+git+https://github.com/alphagov/notifications-utils.git@55.1.2#egg=notifications-utils==55.1.2
