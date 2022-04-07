@@ -4,7 +4,7 @@
 #
 #    pip-compile requirements.in
 #
-amqp==5.0.6
+amqp==5.1.0
     # via kombu
 awscli==1.19.80
     # via
@@ -54,7 +54,7 @@ click-didyoumean==0.0.3
     # via celery
 click-plugins==1.1.1
     # via celery
-click-repl==0.1.6
+click-repl==0.2.0
     # via celery
 colorama==0.4.3
     # via awscli
@@ -62,7 +62,7 @@ cryptography==3.4.8
     # via paramiko
 docutils==0.15.2
     # via awscli
-flask==1.1.2
+flask==2.0.3
     # via
     #   -r requirements.in
     #   flask-redis
@@ -71,7 +71,7 @@ flask-redis==0.4.0
     # via notifications-utils
 geojson==2.5.0
     # via notifications-utils
-govuk-bank-holidays==0.8
+govuk-bank-holidays==0.11
     # via notifications-utils
 idna==2.10
     # via requests
@@ -87,13 +87,13 @@ jmespath==0.10.0
     # via
     #   boto3
     #   botocore
-kombu==5.1.0
+kombu==5.2.4
     # via celery
 markupsafe==2.0.1
     # via jinja2
 mistune==0.8.4
     # via notifications-utils
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@51.3.0
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@55.1.2
     # via -r requirements.in
 orderedset==2.0.3
     # via notifications-utils
@@ -127,7 +127,7 @@ python-dateutil==2.8.1
     #   botocore
 python-json-logger==2.0.1
     # via notifications-utils
-pytz==2021.1
+pytz==2022.1
     # via
     #   celery
     #   notifications-utils
@@ -156,7 +156,6 @@ six==1.16.0
     #   bcrypt
     #   bleach
     #   click-repl
-    #   govuk-bank-holidays
     #   pynacl
     #   python-dateutil
 smartypants==2.0.1

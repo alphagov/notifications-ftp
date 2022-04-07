@@ -1,9 +1,8 @@
 -r requirements.txt
-flake8==3.9.1
-freezegun==1.1.0
-isort==5.8.0
-moto==2.0.6
+flake8==4.0.1
+isort==5.10.1
+moto==3.1.4
 pytest-env==0.6.2
-pytest-mock==3.6.0
-pytest==6.2.3
-jinja2-cli[yaml]
+pytest-mock==3.7.0
+pytest==7.1.1
+jinja2-cli[yaml]==0.8.2

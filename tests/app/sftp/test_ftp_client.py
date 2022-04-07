@@ -1,7 +1,6 @@
 from unittest.mock import Mock
 
 import pytest
-from freezegun import freeze_time
 
 from app.sftp.ftp_client import (
     FtpException,
@@ -21,7 +20,6 @@ def mocks(client):
     yield SendZipMocks
 
 
-@freeze_time('2016-01-01T17:00:00')
 def test_upload_zip_success(mocks):
     mock_zip_sftp = Mock(
         pwd='~/notify',
@@ -39,7 +37,6 @@ def test_upload_zip_success(mocks):
     mocks.mock_remote_file.__enter__.return_value.write.assert_called_once()
 
 
-@freeze_time('2016-01-01T17:00:00')
 def test_send_zip_doesnt_overwrite_if_file_exists_with_same_size(mocks):
     mock_zip_sftp = Mock(
         pwd='~/notify',
@@ -54,7 +51,6 @@ def test_send_zip_doesnt_overwrite_if_file_exists_with_same_size(mocks):
     assert mock_zip_sftp.open.called is False
 
 
-@freeze_time('2016-01-01T17:00:00')
 def test_send_zip_overwrites_if_file_exists_with_different_size(mocks):
     mock_zip_sftp = Mock(
         pwd='~/notify',
@@ -70,7 +66,6 @@ def test_send_zip_overwrites_if_file_exists_with_different_size(mocks):
     mock_zip_sftp.open.assert_called_once_with('~/notify/' + mocks.mock_remote_filename, mode='w')
 
 
-@freeze_time('2016-01-01T17:00:00')
 def test_send_zip_errors_if_file_wasnt_put_on(mocks):
     mock_zip_sftp = Mock(
         pwd='~/notify',
@@ -83,7 +78,6 @@ def test_send_zip_errors_if_file_wasnt_put_on(mocks):
         upload_zip(mock_zip_sftp, mocks.mock_data, mocks.mock_remote_filename)
 
 
-@freeze_time('2016-01-01T17:00:00')
 def test_send_zip_errors_if_remote_file_size_is_different(mocks):
     mock_zip_sftp = Mock(
         pwd='~/notify',
