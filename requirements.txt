@@ -6,10 +6,8 @@
 #
 amqp==5.1.0
     # via kombu
-awscli==1.19.80
-    # via
-    #   awscli-cwlogs
-    #   notifications-utils
+awscli==1.22.93
+    # via awscli-cwlogs
 awscli-cwlogs==1.4.6
     # via -r requirements.in
 bcrypt==3.2.0
@@ -18,11 +16,9 @@ billiard==3.6.4.0
     # via celery
 bleach==4.1.0
     # via notifications-utils
-boto3==1.17.63
-    # via
-    #   -r requirements.in
-    #   notifications-utils
-botocore==1.20.80
+boto3==1.21.38
+    # via notifications-utils
+botocore==1.24.38
     # via
     #   awscli
     #   boto3
@@ -93,7 +89,7 @@ markupsafe==2.0.1
     # via jinja2
 mistune==0.8.4
     # via notifications-utils
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@55.1.2
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@55.1.4
     # via -r requirements.in
 orderedset==2.0.3
     # via notifications-utils
@@ -144,7 +140,7 @@ requests==2.25.1
     #   notifications-utils
 rsa==4.7.2
     # via awscli
-s3transfer==0.4.2
+s3transfer==0.5.2
     # via
     #   awscli
     #   boto3
