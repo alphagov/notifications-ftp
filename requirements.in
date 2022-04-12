@@ -2,11 +2,10 @@ pysftp==0.2.9
 Flask==2.0.3
 awscli-cwlogs>=1.4,<1.5
 pycurl==7.43.0.6
-boto3==1.17.63
 click<8.0,>=7.0
 
 # nb: when bumping this, check to see if celery sqs deps have bumped here: https://github.com/celery/celery/blob/master/requirements/extras/sqs.txt
 # celery[sqs] pins pycurl to an old version so we are just installing sqs deps ourselves.
 celery==5.0.5
 
-git+https://github.com/alphagov/notifications-utils.git@55.1.2#egg=notifications-utils==55.1.2
+git+https://github.com/alphagov/notifications-utils.git@55.1.4
