@@ -19,8 +19,8 @@ class Config(object):
     ###########################
 
     NOTIFY_APP_NAME = 'ftp'
-    AWS_REGION = os.getenv('AWS_REGION', 'eu-west-1')
-    NOTIFY_LOG_PATH = os.getenv('NOTIFY_LOG_PATH', '/var/log/notify/application.log')
+    AWS_REGION = 'eu-west-1'
+    NOTIFY_LOG_PATH = os.getenv('NOTIFY_LOG_PATH')
 
     CELERY = {
         'broker_url': 'sqs://',
