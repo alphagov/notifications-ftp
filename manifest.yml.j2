@@ -5,7 +5,7 @@ applications:
     - python_buildpack
 
     routes:
-      - route: notify-ftp-{{ NOTIFY_ENVIRONMENT }}.cloudapps.digital
+      - route: notify-ftp-{{ environment }}.cloudapps.digital
     services:
       - logit-ssl-syslog-drain
 
@@ -35,7 +35,7 @@ applications:
       FTP_PASSWORD: '{{ FTP_PASSWORD }}'
 
       NOTIFICATION_QUEUE_PREFIX: '{{ NOTIFICATION_QUEUE_PREFIX }}'
-      NOTIFY_ENVIRONMENT: '{{ NOTIFY_ENVIRONMENT }}'
+      NOTIFY_ENVIRONMENT: '{{ environment }}'
       NOTIFY_LOG_PATH: '/home/vcap/logs/app.log'
 
       STATSD_HOST: "notify-statsd-exporter-{{ environment }}.apps.internal"
