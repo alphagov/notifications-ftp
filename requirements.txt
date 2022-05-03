@@ -97,7 +97,7 @@ packaging==21.3
     # via bleach
 paramiko==2.10.4
     # via pysftp
-phonenumbers==8.12.23
+phonenumbers==8.12.47
     # via notifications-utils
 prompt-toolkit==3.0.18
     # via click-repl
