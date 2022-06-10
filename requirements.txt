@@ -6,11 +6,13 @@
 #
 amqp==5.1.0
     # via kombu
+async-timeout==4.0.2
+    # via redis
 awscli==1.22.93
     # via awscli-cwlogs
 awscli-cwlogs==1.4.6
     # via -r requirements.in
-bcrypt==3.2.0
+bcrypt==3.2.2
     # via paramiko
 billiard==3.6.4.0
     # via celery
@@ -27,7 +29,7 @@ cachetools==4.2.2
     # via notifications-utils
 celery==5.2.7
     # via -r requirements.in
-certifi==2020.12.5
+certifi==2022.5.18.1
     # via
     #   pyproj
     #   requests
@@ -36,16 +38,16 @@ cffi==1.14.5
     #   bcrypt
     #   cryptography
     #   pynacl
-chardet==4.0.0
+charset-normalizer==2.0.12
     # via requests
-click==8.1.2
+click==8.1.3
     # via
     #   celery
     #   click-didyoumean
     #   click-plugins
     #   click-repl
     #   flask
-click-didyoumean==0.0.3
+click-didyoumean==0.3.0
     # via celery
 click-plugins==1.1.1
     # via celery
@@ -55,6 +57,8 @@ colorama==0.4.3
     # via awscli
 cryptography==3.4.8
     # via paramiko
+deprecated==1.2.13
+    # via redis
 docutils==0.15.2
     # via awscli
 flask==2.1.2
@@ -70,13 +74,13 @@ govuk-bank-holidays==0.11
     # via notifications-utils
 idna==2.10
     # via requests
-importlib-metadata==4.11.3
+importlib-metadata==4.11.4
     # via flask
-itsdangerous==2.0.1
+itsdangerous==2.1.2
     # via
     #   flask
     #   notifications-utils
-jinja2==3.0.1
+jinja2==3.1.2
     # via
     #   flask
     #   notifications-utils
@@ -86,7 +90,7 @@ jmespath==0.10.0
     #   botocore
 kombu==5.2.4
     # via celery
-markupsafe==2.0.1
+markupsafe==2.1.1
     # via jinja2
 mistune==0.8.4
     # via notifications-utils
@@ -95,34 +99,36 @@ notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@56
 orderedset==2.0.3
     # via notifications-utils
 packaging==20.9
-    # via bleach
+    # via
+    #   bleach
+    #   redis
 paramiko==2.7.2
     # via pysftp
-phonenumbers==8.12.23
+phonenumbers==8.12.49
     # via notifications-utils
-prompt-toolkit==3.0.18
+prompt-toolkit==3.0.29
     # via click-repl
 pyasn1==0.4.8
     # via rsa
-pycparser==2.20
+pycparser==2.21
     # via cffi
 pycurl==7.45.1
     # via -r requirements.in
 pynacl==1.4.0
     # via paramiko
-pyparsing==2.4.7
+pyparsing==3.0.9
     # via packaging
 pypdf2==2.1.0
     # via notifications-utils
-pyproj==3.2.1
+pyproj==3.3.1
     # via notifications-utils
 pysftp==0.2.9
     # via -r requirements.in
-python-dateutil==2.8.1
+python-dateutil==2.8.2
     # via
     #   awscli-cwlogs
     #   botocore
-python-json-logger==2.0.1
+python-json-logger==2.0.2
     # via notifications-utils
 pytz==2022.1
     # via
@@ -132,9 +138,9 @@ pyyaml==5.4.1
     # via
     #   awscli
     #   notifications-utils
-redis==3.5.3
+redis==4.3.3
     # via flask-redis
-requests==2.25.1
+requests==2.28.0
     # via
     #   awscli-cwlogs
     #   govuk-bank-holidays
@@ -145,12 +151,11 @@ s3transfer==0.5.2
     # via
     #   awscli
     #   boto3
-shapely==1.8.0
+shapely==1.8.2
     # via notifications-utils
 six==1.16.0
     # via
     #   awscli-cwlogs
-    #   bcrypt
     #   bleach
     #   click-repl
     #   pynacl
@@ -161,7 +166,7 @@ statsd==3.3.0
     # via notifications-utils
 typing-extensions==4.2.0
     # via pypdf2
-urllib3==1.26.5
+urllib3==1.26.9
     # via
     #   botocore
     #   requests
@@ -174,7 +179,9 @@ wcwidth==0.2.5
     # via prompt-toolkit
 webencodings==0.5.1
     # via bleach
-werkzeug==2.0.1
+werkzeug==2.1.2
     # via flask
+wrapt==1.14.1
+    # via deprecated
 zipp==3.8.0
     # via importlib-metadata
