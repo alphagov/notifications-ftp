@@ -72,7 +72,7 @@ geojson==2.5.0
     # via notifications-utils
 govuk-bank-holidays==0.11
     # via notifications-utils
-idna==2.10
+idna==3.3
     # via requests
 importlib-metadata==4.11.4
     # via flask
