@@ -55,7 +55,7 @@ click-repl==0.2.0
     # via celery
 colorama==0.4.5
     # via awscli
-cryptography==3.4.8
+cryptography==37.0.2
     # via paramiko
 deprecated==1.2.13
     # via redis
