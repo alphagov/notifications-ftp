@@ -59,7 +59,7 @@ cryptography==37.0.4
     # via paramiko
 deprecated==1.2.13
     # via redis
-docutils==0.15.2
+docutils==0.19
     # via awscli
 flask==2.1.3
     # via
