@@ -14,7 +14,7 @@ awscli-cwlogs==1.4.6
     # via -r requirements.in
 bcrypt==4.0.0
     # via paramiko
-billiard==3.6.4.0
+billiard==4.0.2
     # via celery
 bleach==4.1.0
     # via notifications-utils
