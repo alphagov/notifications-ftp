@@ -14,7 +14,7 @@ awscli-cwlogs==1.4.6
     # via -r requirements.in
 bcrypt==4.0.0
     # via paramiko
-billiard==4.0.2
+billiard==3.6.4.0
     # via celery
 bleach==5.0.1
     # via notifications-utils
@@ -35,7 +35,6 @@ certifi==2022.6.15
     #   requests
 cffi==1.15.1
     # via
-    #   bcrypt
     #   cryptography
     #   pynacl
 charset-normalizer==2.1.1
@@ -53,13 +52,13 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.2.0
     # via celery
-colorama==0.4.5
+colorama==0.4.4
     # via awscli
 cryptography==3.4.8
     # via paramiko
 deprecated==1.2.13
     # via redis
-docutils==0.19
+docutils==0.16
     # via awscli
 flask==2.2.2
     # via
@@ -91,17 +90,17 @@ jmespath==1.0.1
 kombu==5.2.4
     # via celery
 markupsafe==2.1.1
-    # via jinja2
-mistune==2.0.4
+    # via
+    #   jinja2
+    #   werkzeug
+mistune==0.8.4
     # via notifications-utils
 notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@56.0.0
     # via -r requirements.in
 orderedset==2.0.3
     # via notifications-utils
 packaging==21.3
-    # via
-    #   bleach
-    #   redis
+    # via redis
 paramiko==2.11.0
     # via pysftp
 phonenumbers==8.12.54
@@ -134,7 +133,7 @@ pytz==2022.2.1
     # via
     #   celery
     #   notifications-utils
-pyyaml==6.0
+pyyaml==5.4.1
     # via
     #   awscli
     #   notifications-utils
@@ -145,7 +144,7 @@ requests==2.28.1
     #   awscli-cwlogs
     #   govuk-bank-holidays
     #   notifications-utils
-rsa==4.9
+rsa==4.7.2
     # via awscli
 s3transfer==0.6.0
     # via
@@ -158,7 +157,7 @@ six==1.16.0
     #   awscli-cwlogs
     #   bleach
     #   click-repl
-    #   pynacl
+    #   paramiko
     #   python-dateutil
 smartypants==2.0.1
     # via notifications-utils
