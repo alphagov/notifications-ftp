@@ -104,7 +104,7 @@ packaging==21.3
     #   redis
 paramiko==2.11.0
     # via pysftp
-phonenumbers==8.12.49
+phonenumbers==8.12.54
     # via notifications-utils
 prompt-toolkit==3.0.29
     # via click-repl
