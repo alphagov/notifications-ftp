@@ -101,7 +101,7 @@ orderedset==2.0.3
     # via notifications-utils
 packaging==21.3
     # via redis
-paramiko==2.11.0
+paramiko==2.8.1
     # via pysftp
 phonenumbers==8.12.54
     # via notifications-utils
@@ -157,7 +157,6 @@ six==1.16.0
     #   awscli-cwlogs
     #   bleach
     #   click-repl
-    #   paramiko
     #   python-dateutil
 smartypants==2.0.1
     # via notifications-utils
