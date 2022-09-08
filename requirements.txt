@@ -73,8 +73,6 @@ govuk-bank-holidays==0.11
     # via notifications-utils
 idna==3.3
     # via requests
-importlib-metadata==4.12.0
-    # via flask
 itsdangerous==2.1.2
     # via
     #   flask
@@ -101,7 +99,7 @@ orderedset==2.0.3
     # via notifications-utils
 packaging==21.3
     # via redis
-paramiko==2.8.1
+paramiko==2.10.1
     # via pysftp
 phonenumbers==8.12.54
     # via notifications-utils
@@ -157,13 +155,12 @@ six==1.16.0
     #   awscli-cwlogs
     #   bleach
     #   click-repl
+    #   paramiko
     #   python-dateutil
 smartypants==2.0.1
     # via notifications-utils
 statsd==3.3.0
     # via notifications-utils
-typing-extensions==4.3.0
-    # via pypdf2
 urllib3==1.26.12
     # via
     #   botocore
@@ -181,5 +178,3 @@ werkzeug==2.2.2
     # via flask
 wrapt==1.14.1
     # via deprecated
-zipp==3.8.1
-    # via importlib-metadata
