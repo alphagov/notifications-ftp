@@ -8,7 +8,7 @@ amqp==5.1.1
     # via kombu
 async-timeout==4.0.2
     # via redis
-awscli==1.25.67
+awscli==1.25.77
     # via awscli-cwlogs
 awscli-cwlogs==1.4.6
     # via -r requirements.in
