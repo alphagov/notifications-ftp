@@ -58,7 +58,7 @@ cryptography==38.0.1
     # via paramiko
 deprecated==1.2.13
     # via redis
-docutils==0.16
+docutils==0.19
     # via awscli
 flask==2.2.2
     # via
