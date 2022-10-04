@@ -93,7 +93,7 @@ markupsafe==2.1.1
     # via
     #   jinja2
     #   werkzeug
-mistune==0.8.4
+mistune==2.0.4
     # via notifications-utils
 notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@56.0.0
     # via -r requirements.in
