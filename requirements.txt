@@ -18,7 +18,7 @@ billiard==4.0.2
     # via celery
 bleach==5.0.1
     # via notifications-utils
-boto3==1.24.66
+boto3==1.25.5
     # via notifications-utils
 botocore==1.27.66
     # via
