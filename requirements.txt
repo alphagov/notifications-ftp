@@ -73,7 +73,7 @@ govuk-bank-holidays==0.11
     # via notifications-utils
 idna==3.4
     # via requests
-importlib-metadata==4.12.0
+importlib-metadata==5.0.0
     # via flask
 itsdangerous==2.1.2
     # via
