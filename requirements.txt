@@ -181,5 +181,5 @@ werkzeug==2.2.2
     # via flask
 wrapt==1.14.1
     # via deprecated
-zipp==3.8.1
+zipp==3.10.0
     # via importlib-metadata
