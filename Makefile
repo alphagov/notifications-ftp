@@ -1,5 +1,11 @@
 .DEFAULT_GOAL := help
 SHELL := /bin/bash
+DATE = $(shell date +%Y-%m-%d:%H:%M:%S)
+
+APP_VERSION_FILE = app/version.py
+
+GIT_BRANCH ?= $(shell git symbolic-ref --short HEAD 2> /dev/null || echo "detached")
+GIT_COMMIT ?= $(shell git rev-parse HEAD)
 
 NOTIFY_CREDENTIALS ?= ~/.notify-credentials
 CF_APP = "notify-ftp"
@@ -31,6 +37,11 @@ shell: ## Start a local shell with an app context
 .PHONY: help
 help:
 	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+.PHONY: generate-version-file
+generate-version-file: ## Generates the app version file
+	@echo -e "__git_commit__ = \"${GIT_COMMIT}\"\n__time__ = \"${DATE}\"" > ${APP_VERSION_FILE}
+
 
 .PHONY: generate-manifest
 generate-manifest: ## Generates cf manifest
