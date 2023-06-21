@@ -8,3 +8,5 @@ pycurl==7.45.1
 celery==5.2.7
 
 git+https://github.com/alphagov/notifications-utils.git@56.0.0
+
+sentry-sdk[flask,celery]>=1.0.0,<2.0.0
