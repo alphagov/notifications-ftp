@@ -13,7 +13,7 @@ CF_ORG = "govuk-notify"
 CF_MANIFEST_PATH ?= /tmp/manifest.yml
 
 .PHONY: bootstrap
-bootstrap: ## Install dependencies, etc.
+bootstrap: generate-version-file ## Install dependencies, etc.
 	pip install -r requirements_for_test.txt
 
 .PHONY: run-celery

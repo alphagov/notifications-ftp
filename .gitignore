@@ -79,3 +79,6 @@ target/
 # IDEs
 .vscode
 .idea/
+
+# Files/folders created by build so not present in .cfignore
+app/version.py
