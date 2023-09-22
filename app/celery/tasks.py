@@ -30,8 +30,8 @@ def get_error_task_name_or_retry(task, upload_filename):
     name="zip-and-send-letter-pdfs",
     max_retries=5,
     default_retry_delay=300,
-    # after 90 seconds celery will raise a SoftTimeLimitExceeded exception
-    soft_time_limit=90
+    # after 3 minutes celery will raise a SoftTimeLimitExceeded exception
+    soft_time_limit=180
 )
 def zip_and_send_letter_pdfs(self, filenames_to_zip, upload_filename):
     folder_date = filenames_to_zip[0].split('/')[0]
