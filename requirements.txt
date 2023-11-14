@@ -158,7 +158,9 @@ s3transfer==0.6.1
     #   awscli
     #   boto3
 sentry-sdk[celery,flask]==1.25.1
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   sentry-sdk
 shapely==1.8.4
     # via notifications-utils
 six==1.16.0
@@ -187,7 +189,7 @@ wcwidth==0.2.5
     # via prompt-toolkit
 webencodings==0.5.1
     # via bleach
-werkzeug==2.2.2
+werkzeug==2.3.8
     # via flask
 wrapt==1.14.1
     # via deprecated
