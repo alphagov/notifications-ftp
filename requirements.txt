@@ -33,7 +33,7 @@ celery==5.2.7
     # via
     #   -r requirements.in
     #   sentry-sdk
-certifi==2022.6.15
+certifi==2023.7.22
     # via
     #   pyproj
     #   requests
