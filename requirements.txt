@@ -59,7 +59,7 @@ click-repl==0.2.0
     # via celery
 colorama==0.4.4
     # via awscli
-cryptography==3.4.8
+cryptography==41.0.6
     # via paramiko
 deprecated==1.2.13
     # via redis
@@ -158,9 +158,7 @@ s3transfer==0.6.1
     #   awscli
     #   boto3
 sentry-sdk[celery,flask]==1.25.1
-    # via
-    #   -r requirements.in
-    #   sentry-sdk
+    # via -r requirements.in
 shapely==1.8.4
     # via notifications-utils
 six==1.16.0
