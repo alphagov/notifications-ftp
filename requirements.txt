@@ -65,7 +65,7 @@ deprecated==1.2.13
     # via redis
 docutils==0.16
     # via awscli
-flask==2.2.2
+flask==2.2.5
     # via
     #   -r requirements.in
     #   flask-redis
@@ -158,7 +158,9 @@ s3transfer==0.6.1
     #   awscli
     #   boto3
 sentry-sdk[celery,flask]==1.25.1
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   sentry-sdk
 shapely==1.8.4
     # via notifications-utils
 six==1.16.0
